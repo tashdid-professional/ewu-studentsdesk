@@ -32,7 +32,7 @@ export default function Home() {
         </Link>
         {/* Routine Generator Card */}
         <Link
-          href="/routine-page"
+          href="/routine-generator"
           className="relative bg-gradient-to-br from-blue-100 via-white to-indigo-100 rounded-3xl shadow-2xl hover:scale-105 hover:shadow-blue-300 transition-all duration-300 p-8 flex flex-col items-center border-2 border-blue-200 hover:border-blue-400 group overflow-hidden"
         >
           <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-blue-100 rounded-full blur-2xl opacity-60 group-hover:opacity-80 transition-all duration-300 z-0" />
