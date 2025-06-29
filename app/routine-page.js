@@ -28,8 +28,8 @@ function RoutinePage({ selectedSections, onBack }) {
       'T': 'Tuesday', 
       'W': 'Wednesday',
       'R': 'Thursday',
-      'S': 'Saturday',
-      'A': 'Friday',
+      'S': 'Sunday',
+      'A': 'Saturday',
       'F': 'Friday'
     };
 
@@ -75,8 +75,8 @@ function RoutinePage({ selectedSections, onBack }) {
     'T': 'Tuesday', 
     'W': 'Wednesday',
     'R': 'Thursday',
-    'S': 'Saturday',
-    'A': 'Friday',
+    'S': 'Sunday',
+    'A': 'Saturday',
     'F': 'Friday'
   };
 
