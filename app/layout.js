@@ -1,5 +1,5 @@
 import "./globals.css";
-import CoursePlanner from "./course-planner";
+import CoursePlanner from "../components/course-planner";
 
 
 export const metadata = {

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import CoursePlanner from "./course-planner";
+import CoursePlanner from "../components/course-planner";
 
 export default function Home() {
   return (

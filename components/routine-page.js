@@ -22,15 +22,15 @@ function RoutinePage({ selectedSections, onBack }) {
 
   // Generate organized routine
   const generateRoutine = () => {
-    const dayOrder = ['M', 'T', 'W', 'R', 'S', 'A', 'F'];
+    const dayOrder = ['M', 'T', 'W', 'R', 'S', 'A'];
     const dayNames = {
       'M': 'Monday',
       'T': 'Tuesday', 
       'W': 'Wednesday',
       'R': 'Thursday',
       'S': 'Sunday',
-      'A': 'Saturday',
-      'F': 'Friday'
+      'A': 'Saturday'
+     
     };
 
     // Build all time slots
@@ -69,15 +69,15 @@ function RoutinePage({ selectedSections, onBack }) {
   };
 
   const routine = generateRoutine();
-  const dayOrder = ['M', 'T', 'W', 'R', 'S', 'A', 'F'];
+  const dayOrder = ['M', 'T', 'W', 'R', 'S', 'A'];
   const dayNames = {
     'M': 'Monday',
     'T': 'Tuesday', 
     'W': 'Wednesday',
     'R': 'Thursday',
     'S': 'Sunday',
-    'A': 'Saturday',
-    'F': 'Friday'
+    'A': 'Saturday'
+    
   };
 
   return (
