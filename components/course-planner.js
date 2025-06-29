@@ -141,12 +141,24 @@ export default function CoursePlanner() {
                         </div>
                       ))}
                     </div>
-                    <button
-                      className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow hover:from-blue-600 hover:to-purple-600 transition w-full sm:w-auto"
-                      onClick={() => handleAddSection(course, section)}
-                    >
-                      Add
-                    </button>
+                    <div className="flex gap-2 w-full sm:w-auto">
+                      <a
+                      href={`https://www.facebook.com/groups/161934770547464/search/?q=${course.code.toLowerCase()}%20${section.faculty.toLowerCase()}
+`}
+                       
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow hover:from-yellow-500 hover:to-orange-600 transition w-full sm:w-auto text-center"
+                      >
+                        Review
+                      </a>
+                      <button
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow hover:from-blue-600 hover:to-purple-600 transition w-full sm:w-auto"
+                        onClick={() => handleAddSection(course, section)}
+                      >
+                        Add
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
