@@ -119,6 +119,7 @@ export default function CoursePlanner() {
         value={search}
         onChange={e => setSearch(e.target.value)}
       />
+      <h1 className="pb-7 font-semibold"> N.B : For Reviews make sure you are logged in to your facebook account and added to EWU Faculty and Course Review group</h1>
       <div className="flex flex-col-reverse md:flex-row gap-6 md:gap-10 items-start">
         <div className="grid gap-4 sm:gap-6 md:gap-8 w-full md:w-2/3">
           {filteredCourses.length === 0 && (
