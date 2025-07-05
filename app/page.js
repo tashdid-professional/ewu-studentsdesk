@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen  flex flex-col items-center justify-center p-4 pt-24">
       <div className="max-w-2xl w-full text-center mb-10">
         <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-800 mb-2 drop-shadow-lg">
           East West University Helpdesk
@@ -65,10 +65,6 @@ export default function Home() {
           </span>
         </Link>
       </div>
-      <footer className="mt-16 text-indigo-400 text-xs text-center opacity-80">
-        &copy; {new Date().getFullYear()} East West University Helpdesk. Made with{" "}
-        <span className="text-pink-500">♥</span> for EWU students.
-      </footer>
     </div>
   );
 }

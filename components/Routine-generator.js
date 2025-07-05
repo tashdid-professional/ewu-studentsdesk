@@ -197,8 +197,9 @@ function RoutineGenerator() {
           days.forEach(day => {
             if (!schedule[day]) schedule[day] = [];
             
-            // Determine course name with improved logic
+            // Determine course name and section with improved logic
             let courseName = course;
+            let courseSection = section;
             
             // If no course name in current row, try to inherit from context
             if (!courseName) {
@@ -206,6 +207,8 @@ function RoutineGenerator() {
               for (let prevIdx = rowIdx - 1; prevIdx >= 0; prevIdx--) {
                 const prevRow = courseRows[prevIdx];
                 const prevCourse = prevRow && prevRow[courseIdx] ? prevRow[courseIdx].toString().trim() : '';
+                const prevSection = prevRow && secIdx > -1 && prevRow[secIdx] ? prevRow[secIdx].toString().trim() : '';
+                
                 if (prevCourse && /^[A-Z]{2,4}\d{3,4}/.test(prevCourse)) {
                   // Check if current row is actually a lab by looking at room or course name indicators
                   const isLab = room && (
@@ -224,6 +227,13 @@ function RoutineGenerator() {
                     // It's likely another time slot for the same course, not a lab
                     courseName = prevCourse;
                   }
+                  
+                  // Always inherit section from the previous course if current row doesn't have one
+                  if (!courseSection && prevSection) {
+                    courseSection = prevSection;
+                    console.log(`Inherited section "${prevSection}" for course "${courseName}"`);
+                  }
+                  
                   break;
                 }
               }
@@ -234,9 +244,26 @@ function RoutineGenerator() {
               }
             }
             
+            // Also check if we have a course name but no section, inherit from previous course
+            if (courseName && !courseSection) {
+              for (let prevIdx = rowIdx - 1; prevIdx >= 0; prevIdx--) {
+                const prevRow = courseRows[prevIdx];
+                const prevCourse = prevRow && prevRow[courseIdx] ? prevRow[courseIdx].toString().trim() : '';
+                const prevSection = prevRow && secIdx > -1 && prevRow[secIdx] ? prevRow[secIdx].toString().trim() : '';
+                
+                if (prevCourse && /^[A-Z]{2,4}\d{3,4}/.test(prevCourse) && prevSection) {
+                  courseSection = prevSection;
+                  console.log(`Inherited section "${prevSection}" for existing course "${courseName}"`);
+                  break;
+                }
+              }
+            }
+            
+            console.log(`Final course data: ${courseName}, section: ${courseSection || 'No section'}`);
+            
             schedule[day].push({
               course: courseName,
-              section,
+              section: courseSection || '',
               credits,
               time: `${parsed.startTime}-${parsed.endTime}`,
               room,
@@ -393,7 +420,7 @@ function RoutineGenerator() {
                   <div style="background: white; margin-bottom: 15px; padding: 18px; border-radius: 15px; border-left: 5px solid #2563eb; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
                     <div style="font-weight: bold; color: #1e40af; font-size: 18px; margin-bottom: 10px; line-height: 1.2;">${cls.course}</div>
                     <div style="font-size: 15px; color: #6b7280; line-height: 1.5;">
-                      <div style="margin-bottom: 6px;"><span style="font-weight: 600;">Section:</span> ${cls.section || 'N/A'}</div>
+                      <div style="margin-bottom: 6px;"><span style="font-weight: 600;">Section:</span> ${cls.section || 'TBA'}</div>
                       <div style="color: #2563eb; font-weight: bold; margin-bottom: 6px; font-size: 16px;"><span style="font-weight: 600;">Time:</span> ${cls.time}</div>
                       <div><span style="font-weight: 600;">Room:</span> ${cls.room || 'TBA'}</div>
                     </div>
@@ -622,7 +649,7 @@ function RoutineGenerator() {
                       <div class="class-item">
                         <div class="course-name">${cls.course}</div>
                         <div class="class-details">
-                          <div>Section: ${cls.section}</div>
+                          <div>Section: ${cls.section || 'TBA'}</div>
                           <div class="time">${cls.time}</div>
                           <div>Room: ${cls.room}</div>
                         </div>
@@ -649,7 +676,7 @@ function RoutineGenerator() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="  p-4">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-3xl shadow-2xl p-8 mb-8 border-2 border-blue-200 relative overflow-hidden no-print">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-200 rounded-full blur-2xl opacity-30 z-0" />
@@ -682,9 +709,9 @@ function RoutineGenerator() {
                       {weeklySchedule[day].map((cls, idx) => (
                         <div key={idx} className="bg-white rounded-lg p-3 shadow border-l-4 border-blue-500">
                           <div className="font-bold text-blue-800">{cls.course}</div>
-                          <div className="text-sm text-gray-600">Section: {cls.section}</div>
+                          <div className="text-sm text-gray-600">Section: {cls.section || 'TBA'}</div>
                           <div className="text-sm text-blue-600 font-semibold">{cls.time}</div>
-                          <div className="text-sm text-gray-600">Room: {cls.room}</div>
+                          <div className="text-sm text-gray-600">Room: {cls.room || 'TBA'}</div>
                           {/* <div className="text-xs text-gray-500">Credits: {cls.credits}</div> */}
                         </div>
                       ))}
