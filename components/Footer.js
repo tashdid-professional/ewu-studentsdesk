@@ -121,7 +121,7 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="border-t border-indigo-200 mt-8 pt-6 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0">
           <p className="text-indigo-500 text-sm">
-            © {currentYear} East West University Helpdesk. Developed by Hasan Habibur Rahman
+            © {currentYear} East West University Helpdesk. Developed by <a href="https://www.tashdid.online/" target='_blank'><span className='font-semibold underline'>Hasan Habibur Rahman</span></a>
           </p>
           {/* <div className="flex space-x-6 text-xs text-indigo-500">
             <Link href="/privacy" className="hover:text-indigo-700 transition-colors">
