@@ -197,15 +197,41 @@ function RoutineGenerator() {
           days.forEach(day => {
             if (!schedule[day]) schedule[day] = [];
             
-            // Determine course name - use actual course name, or try to inherit from context
+            // Determine course name with improved logic
             let courseName = course;
-            if (!courseName && courseRows[rowIdx - 1]) {
-              // Try to get course name from previous row (for lab sessions)
-              const prevCourse = courseRows[rowIdx - 1][courseIdx];
-              courseName = prevCourse ? prevCourse.toString().trim() + ' Lab' : 'Lab Session';
-            }
+            
+            // If no course name in current row, try to inherit from context
             if (!courseName) {
-              courseName = 'Unknown Course';
+              // Look for the most recent course name in previous rows
+              for (let prevIdx = rowIdx - 1; prevIdx >= 0; prevIdx--) {
+                const prevRow = courseRows[prevIdx];
+                const prevCourse = prevRow && prevRow[courseIdx] ? prevRow[courseIdx].toString().trim() : '';
+                if (prevCourse && /^[A-Z]{2,4}\d{3,4}/.test(prevCourse)) {
+                  // Check if current row is actually a lab by looking at room or course name indicators
+                  const isLab = room && (
+                    room.toLowerCase().includes('lab') || 
+                    room.toLowerCase().includes('electronics') ||
+                    room.toLowerCase().includes('computer')
+                  );
+                  
+                  // Also check if this row explicitly mentions "lab" in the original course field
+                  const originalCourseField = row[courseIdx] ? row[courseIdx].toString().trim().toLowerCase() : '';
+                  const hasLabInName = originalCourseField.includes('lab');
+                  
+                  if (isLab || hasLabInName) {
+                    courseName = prevCourse + ' Lab';
+                  } else {
+                    // It's likely another time slot for the same course, not a lab
+                    courseName = prevCourse;
+                  }
+                  break;
+                }
+              }
+              
+              // Fallback if no previous course found
+              if (!courseName) {
+                courseName = 'Unknown Course';
+              }
             }
             
             schedule[day].push({
