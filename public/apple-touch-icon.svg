@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <defs>
+    <linearGradient id="appleTouchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="appleTextGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e0e7ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background with rounded corners for iOS -->
+  <rect width="180" height="180" rx="20" fill="url(#appleTouchGrad)"/>
+  
+  <!-- EWU Text -->
+  <text x="90" y="110" font-family="Arial, sans-serif" font-size="45" font-weight="bold" 
+        text-anchor="middle" fill="url(#appleTextGrad)" stroke="#1e1b4b" stroke-width="1">
+    EWU
+  </text>
+  
+  <!-- Decorative elements -->
+  <circle cx="35" cy="45" r="6" fill="#ffffff" opacity="0.3"/>
+  <circle cx="145" cy="145" r="4" fill="#ffffff" opacity="0.4"/>
+  <circle cx="140" cy="45" r="4" fill="#ffffff" opacity="0.3"/>
+  <circle cx="45" cy="140" r="3" fill="#ffffff" opacity="0.2"/>
+</svg>
