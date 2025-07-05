@@ -105,7 +105,7 @@ export default function Footer() {
                   <FaGithub className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://linkedin.com/company/ewu-helpdesk"
+                  href="https://www.linkedin.com/in/habibur-rahman-tashdid/"
                   className="text-indigo-600 hover:text-indigo-800 transition-colors"
                   title="LinkedIn"
                   target="_blank"
