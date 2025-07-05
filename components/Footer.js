@@ -85,7 +85,7 @@ export default function Footer() {
             <h3 className="text-indigo-800 font-semibold text-lg">Contact</h3>
             <div className="space-y-2">
               <p className="text-indigo-600 text-sm">
-                Want to suggest a feature? Get in touch with the developer!
+                 Get in touch with the developer!
               </p>
               <div className="flex space-x-4">
                 <a
