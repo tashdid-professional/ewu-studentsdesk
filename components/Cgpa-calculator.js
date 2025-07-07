@@ -5,14 +5,14 @@ const gradePoints = {
   "A+": 4.0, "A": 3.75, "A-": 3.5,
   "B+": 3.25, "B": 3.0, "B-": 2.75,
   "C+": 2.5, "C": 2.25, 
-    "D": 2.0, "F": 0.0
+  "D": 2.0, "F": 0.0
 };
 
 export default function CgpaCalculator() {
   const [courses, setCourses] = useState([
-    { credit: "", grade: "" },
-    { credit: "", grade: "" },
-    { credit: "", grade: "" }
+    { name: "", credit: "", grade: "" },
+    { name: "", credit: "", grade: "" },
+    { name: "", credit: "", grade: "" }
   ]);
   const [prevCredit, setPrevCredit] = useState("");
   const [prevCgpa, setPrevCgpa] = useState("");
@@ -24,7 +24,7 @@ export default function CgpaCalculator() {
     setCourses(updated);
   };
 
-  const addCourse = () => setCourses([...courses, { credit: "", grade: "" }]);
+  const addCourse = () => setCourses([...courses, { name: "", credit: "", grade: "" }]);
   const removeCourse = (idx) => setCourses(courses.filter((_, i) => i !== idx));
 
   const calculate = () => {
@@ -55,13 +55,20 @@ export default function CgpaCalculator() {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-gradient-to-br from-blue-50 via-white to-indigo-100 rounded-2xl shadow-xl p-6 mt-8 border-2 border-blue-200/60 relative overflow-hidden">
+    <div className="max-w-lg mx-auto bg-gradient-to-br from-blue-50 via-white to-indigo-100 rounded-2xl shadow-xl p-6 mt-8 border-2 border-blue-200/60 relative overflow-hidden">
       <div className="absolute -top-8 -left-8 w-28 h-28 bg-blue-200 rounded-full blur-2xl opacity-30 z-0" />
       <div className="absolute -bottom-8 -right-8 w-28 h-28 bg-indigo-200 rounded-full blur-2xl opacity-30 z-0" />
       <h2 className="text-2xl font-extrabold text-blue-700 mb-4 text-center drop-shadow-lg z-10 relative tracking-tight">CGPA Calculator</h2>
       <div className="space-y-3 z-10 relative">
         {courses.map((c, idx) => (
           <div key={idx} className="flex gap-2 items-center bg-white/80 rounded-lg shadow p-2 border border-blue-100 hover:border-blue-300 transition">
+            <input
+              type="text"
+              className="flex-1 p-1.5 border-2 border-blue-200 rounded focus:ring-2 focus:ring-blue-400 focus:outline-none font-semibold text-blue-700 bg-blue-50 placeholder:text-blue-300 text-sm"
+              placeholder="Course Name (optional)"
+              value={c.name}
+              onChange={e => handleCourseChange(idx, "name", e.target.value)}
+            />
             <input
               type="number"
               min="0"
@@ -82,12 +89,22 @@ export default function CgpaCalculator() {
               ))}
             </select>
             <button
-              className="text-red-500 font-bold px-2 py-0.5 rounded-full hover:bg-red-100 transition text-base disabled:opacity-40"
+              className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg transition-all duration-200 disabled:opacity-40 disabled:hover:bg-transparent group"
               onClick={() => removeCourse(idx)}
               disabled={courses.length === 1}
               title="Remove course"
             >
-              ×
+              <svg 
+                className="w-4 h-4 group-hover:scale-110 transition-transform" 
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
             </button>
           </div>
         ))}
