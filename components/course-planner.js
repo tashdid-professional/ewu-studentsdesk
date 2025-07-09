@@ -53,7 +53,10 @@ export default function CoursePlanner() {
   const [selectedSections, setSelectedSections] = useState([]);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [facultySearch, setFacultySearch] = useState("");
   const [showRoutine, setShowRoutine] = useState(false);
+  const [combinations, setCombinations] = useState([]);
+  const [currentCombinationName, setCurrentCombinationName] = useState("");
 
   const handleAddSection = (course, section) => {
     const sectionId = `${course.code}-${section.section}`;
@@ -92,11 +95,334 @@ export default function CoursePlanner() {
     setError("");
   };
 
+  const handleSaveCombination = () => {
+    if (selectedSections.length === 0) {
+      setError("Please select at least one course before saving the combination.");
+      return;
+    }
+    
+    const combinationName = currentCombinationName.trim() || `Combination ${combinations.length + 1}`;
+    const newCombination = {
+      id: Date.now(),
+      name: combinationName,
+      sections: [...selectedSections],
+      createdAt: new Date().toLocaleString()
+    };
+    
+    setCombinations([...combinations, newCombination]);
+    setSelectedSections([]);
+    setCurrentCombinationName("");
+    setError("");
+  };
+
+  const handleRemoveCombination = (combinationId) => {
+    setCombinations(combinations.filter(combo => combo.id !== combinationId));
+  };
+
+  const handleExportCombinations = async () => {
+    if (combinations.length === 0) {
+      setError("No combinations to export. Please create at least one combination first.");
+      return;
+    }
+
+    try {
+      setError(""); // Clear any previous errors
+      
+      // Show loading state
+      const originalText = document.querySelector('[data-export-btn]')?.textContent;
+      const exportBtn = document.querySelector('[data-export-btn]');
+      if (exportBtn) exportBtn.textContent = 'Exporting...';
+
+      // Try Canvas API first (more reliable)
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Calculate dynamic canvas height based on content
+      let totalHeight = 150; // Header space
+      combinations.forEach(combination => {
+        const coursesCount = combination.sections.length;
+        totalHeight += 80 + (coursesCount * 45) + 20; // Reduced height per course since faculty and times are on same line
+      });
+      
+      // Set canvas size
+      canvas.width = 900;
+      canvas.height = Math.max(600, totalHeight);
+      
+      // Fill background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Add title
+      ctx.fillStyle = '#7c3aed';
+      ctx.font = 'bold 28px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Course Combinations (${combinations.length})`, canvas.width / 2, 40);
+      
+      // Add subtitle
+      ctx.font = '16px Arial, sans-serif';
+      ctx.fillStyle = '#374151';
+      ctx.fillText('EWU Helpdesk - Course Planner Export', canvas.width / 2, 65);
+      
+      // Add date
+      ctx.font = '14px Arial, sans-serif';
+      ctx.fillStyle = '#6b7280';
+      ctx.fillText(`Generated on: ${new Date().toLocaleString()}`, canvas.width / 2, 85);
+      
+      // Add separator line
+      ctx.strokeStyle = '#e5e7eb';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(50, 105);
+      ctx.lineTo(canvas.width - 50, 105);
+      ctx.stroke();
+      
+      let yPosition = 130;
+      
+      combinations.forEach((combination, index) => {
+        const combinationHeight = 60 + (combination.sections.length * 45) + 20; // Updated height calculation
+        
+        // Combination background with rounded corners effect
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(30, yPosition, canvas.width - 60, combinationHeight);
+        
+        // Combination border
+        ctx.strokeStyle = '#d1d5db';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(30, yPosition, canvas.width - 60, combinationHeight);
+        
+        // Combination header background
+        ctx.fillStyle = '#e0e7ff';
+        ctx.fillRect(30, yPosition, canvas.width - 60, 50);
+        
+        // Combination number and name
+        ctx.fillStyle = '#3730a3';
+        ctx.font = 'bold 18px Arial, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`${index + 1}. ${combination.name}`, 45, yPosition + 25);
+        
+        // Creation date
+        ctx.fillStyle = '#6366f1';
+        ctx.font = '12px Arial, sans-serif';
+        ctx.fillText(`Created: ${combination.createdAt}`, 45, yPosition + 42);
+        
+        // Course count
+        ctx.fillStyle = '#059669';
+        ctx.font = 'bold 12px Arial, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(`${combination.sections.length} courses`, canvas.width - 45, yPosition + 25);
+        
+        let courseY = yPosition + 65;
+        
+        // Display all courses with full details
+        combination.sections.forEach((section, sIdx) => {
+          // Course header
+          ctx.fillStyle = '#1f2937';
+          ctx.font = 'bold 14px Arial, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(`${sIdx + 1}. ${section.courseCode} - Section ${section.section}`, 50, courseY);
+          
+          courseY += 20;
+          
+          // Faculty and times on the same line(s)
+          const facultyText = `Faculty: ${formatFacultyDisplay(section.faculty)}`;
+          const timesText = section.times.map(time => time.time).join(' | ');
+          
+          // Faculty name (left side)
+          ctx.fillStyle = '#4338ca';
+          ctx.font = '12px Arial, sans-serif';
+          ctx.fillText(facultyText, 70, courseY);
+          
+          // Measure faculty text width to position times
+          const facultyWidth = ctx.measureText(facultyText).width;
+          
+          // Times (right side, starting after faculty text)
+          ctx.fillStyle = '#059669';
+          ctx.font = '11px Arial, sans-serif';
+          ctx.fillText(`⏰ ${timesText}`, 70 + facultyWidth + 20, courseY);
+          
+          courseY += 25; // Space between courses
+        });
+        
+        yPosition += combinationHeight + 20; // Space between combinations
+      });
+      
+      // Add footer
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '10px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Generated by EWU Helpdesk Course Planner', canvas.width / 2, canvas.height - 20);
+      ctx.fillText('Visit: ewu-helpdesk.vercel.app', canvas.width / 2, canvas.height - 8);
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `course-combinations-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = canvas.toDataURL('image/png');
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Show success message briefly
+      if (exportBtn) {
+        exportBtn.textContent = 'Exported!';
+        setTimeout(() => {
+          if (originalText) exportBtn.textContent = originalText;
+        }, 2000);
+      }
+
+    } catch (error) {
+      console.error('Canvas export failed, trying html2canvas:', error);
+      
+      // Fallback to html2canvas
+      try {
+        const html2canvas = (await import('html2canvas')).default;
+        const element = document.getElementById('combinations-list');
+        
+        if (!element) {
+          throw new Error('Export element not found');
+        }
+
+        // Temporarily remove max-height and overflow for capture
+        const originalMaxHeight = element.style.maxHeight;
+        const originalOverflow = element.style.overflow;
+        element.style.maxHeight = 'none';
+        element.style.overflow = 'visible';
+
+        const canvas = await html2canvas(element, {
+          backgroundColor: '#ffffff',
+          scale: 1.5,
+          useCORS: true,
+          allowTaint: false,
+          logging: false
+        });
+
+        // Restore original styles
+        element.style.maxHeight = originalMaxHeight;
+        element.style.overflow = originalOverflow;
+
+        // Create and trigger download
+        const link = document.createElement('a');
+        link.download = `course-combinations-${new Date().toISOString().split('T')[0]}.png`;
+        link.href = canvas.toDataURL('image/png');
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        if (exportBtn) {
+          exportBtn.textContent = 'Exported!';
+          setTimeout(() => {
+            if (originalText) exportBtn.textContent = originalText;
+          }, 2000);
+        }
+        
+      } catch (html2canvasError) {
+        console.error('html2canvas also failed:', html2canvasError);
+        
+        // Final fallback: Export as text file
+        try {
+          const textContent = generateTextExport();
+          const blob = new Blob([textContent], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = `course-combinations-${new Date().toISOString().split('T')[0]}.txt`;
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          
+          setError('Image export failed, but combinations exported as text file instead.');
+        } catch (fallbackError) {
+          setError(`All export methods failed. Please try again.`);
+        }
+      }
+      
+      // Reset button text
+      const exportBtn = document.querySelector('[data-export-btn]');
+      if (exportBtn && originalText) exportBtn.textContent = originalText;
+    }
+  };
+
+  const handleViewAnalytics = () => {
+    // Navigate to analytics page with combinations data
+    const analyticsData = {
+      combinations: combinations,
+      totalCombinations: combinations.length,
+      generatedAt: new Date().toISOString()
+    };
+    
+    // Store in session storage for the analytics page
+    sessionStorage.setItem('combinationsAnalytics', JSON.stringify(analyticsData));
+    
+    // Navigate to analytics page
+    window.open('/course-planner/analytics', '_blank');
+  };
+
+  const generateTextExport = () => {
+    let content = `Course Combinations Export\n`;
+    content += `Generated on: ${new Date().toLocaleString()}\n`;
+    content += `Total Combinations: ${combinations.length}\n\n`;
+    content += '='.repeat(50) + '\n\n';
+    
+    combinations.forEach((combination, index) => {
+      content += `${index + 1}. ${combination.name}\n`;
+      content += `   Created: ${combination.createdAt}\n`;
+      content += `   Courses:\n`;
+      combination.sections.forEach(section => {
+        content += `   • ${section.courseCode} - Section ${section.section} (${formatFacultyDisplay(section.faculty)})\n`;
+        section.times.forEach(time => {
+          content += `     ${time.time}\n`;
+        });
+      });
+      content += '\n' + '-'.repeat(30) + '\n\n';
+    });
+    
+    return content;
+  };
+
+  // Helper function to get faculty names as an array
+  const getFacultyNames = (facultyString) => {
+    if (!facultyString) return [];
+    // Split by common separators: comma, slash, ampersand, or "and"
+    return facultyString.split(/[,/&]|\sand\s/i)
+      .map(name => name.trim())
+      .filter(name => name.length > 0);
+  };
+
+  // Helper function to format faculty display
+  const formatFacultyDisplay = (facultyString) => {
+    const names = getFacultyNames(facultyString);
+    if (names.length <= 1) return facultyString;
+    if (names.length === 2) return names.join(' & ');
+    return names.slice(0, -1).join(', ') + ' & ' + names[names.length - 1];
+  };
+
+  // Helper function to check if any faculty name matches the search
+  const facultyMatchesSearch = (facultyString, searchTerm) => {
+    if (!searchTerm) return true;
+    const facultyNames = getFacultyNames(facultyString);
+    return facultyNames.some(name => 
+      name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+
   // Filter courses by search
-  const filteredCourses = courses.filter(course =>
-    course.code.toLowerCase().includes(search.toLowerCase()) ||
-    (course.title && course.title.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filteredCourses = courses.filter(course => {
+    // Course search filter
+    const matchesCourseSearch = !search || 
+      course.code.toLowerCase().includes(search.toLowerCase()) ||
+      (course.title && course.title.toLowerCase().includes(search.toLowerCase()));
+    
+    // Faculty search filter - if faculty search is active, only show courses with matching faculty
+    const matchesFacultySearch = !facultySearch || 
+      course.sections.some(section => 
+        facultyMatchesSearch(section.faculty, facultySearch)
+      );
+    
+    return matchesCourseSearch && matchesFacultySearch;
+  });
 
   // Helper to parse and organize routine
   function getRoutineTable(sections) {
@@ -112,74 +438,163 @@ export default function CoursePlanner() {
   return (
     <div className="max-w-5xl rounded-2xl mx-auto p-2 sm:p-4 md:p-8 relative min-h-screen">
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 sm:mb-8 text-center text-purple-800 drop-shadow-lg tracking-tight">Course Planner</h1>
-      <input
-        type="text"
-        placeholder="Search course code or title..."
-        className="w-full mb-6 sm:mb-8 p-2 sm:p-3 border-2 border-blue-200 rounded-xl shadow focus:outline-none focus:border-blue-400 bg-white text-base sm:text-lg"
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-      />
+      
+      {/* Sticky Search Section */}
+      <div className="sticky top-15 z-20 bg-white/95 backdrop-blur-md border-2 border-blue-200 rounded-xl shadow-lg mb-6 sm:mb-8 p-4 transition-all duration-300">
+        {/* Course Search */}
+        <div className="mb-3 flex gap-2">
+          <input
+            type="text"
+            placeholder="🔍 Search course code or title..."
+            className="w-full p-2 sm:p-3 border-2 border-blue-200 rounded-lg shadow focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white text-base sm:text-lg transition-all duration-200"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        
+        
+       
+          <input
+            type="text"
+            placeholder="👨‍🏫 Search by faculty name..."
+            className="w-full p-2 sm:p-3 border-2 border-purple-200 rounded-lg shadow focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 bg-white text-base sm:text-lg transition-all duration-200"
+            value={facultySearch}
+            onChange={e => setFacultySearch(e.target.value)}
+          />
+        </div>
+        
+        {/* Search Results Info */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            Found {filteredCourses.length} courses
+            {search && ` matching course "${search}"`}
+            {facultySearch && ` with faculty "${facultySearch}"`}
+          </div>
+          {/* Clear search buttons */}
+          {(search || facultySearch) && (
+            <div className="flex gap-2">
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="text-xs bg-blue-200 hover:bg-blue-300 text-blue-700 px-2 py-1 rounded-full transition-colors duration-200"
+                >
+                  Clear Course
+                </button>
+              )}
+              {facultySearch && (
+                <button
+                  onClick={() => setFacultySearch("")}
+                  className="text-xs bg-purple-200 hover:bg-purple-300 text-purple-700 px-2 py-1 rounded-full transition-colors duration-200"
+                >
+                  Clear Faculty
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      
       <h1 className="pb-7 font-semibold"> N.B : For Reviews make sure you are logged in to your facebook account and added to EWU Faculty and Course Review group</h1>
       <div className="flex flex-col-reverse md:flex-row gap-6 md:gap-10 items-start">
         <div className="grid gap-4 sm:gap-6 md:gap-8 w-full md:w-2/3">
           {filteredCourses.length === 0 && (
             <div className="text-center text-gray-400 text-base sm:text-lg">No courses found.</div>
           )}
-          {filteredCourses.map((course) => (
-            <div key={course.code} className="bg-white border-2 border-blue-100 rounded-2xl shadow-lg p-4 sm:p-6 transition-transform hover:scale-[1.02] hover:shadow-2xl">
-              <h2 className="font-bold text-lg sm:text-2xl text-blue-700 mb-2 flex items-center gap-2">
-                <span className="inline-block bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full text-base sm:text-xl font-semibold">{course.code}</span>
-                {/* <span className="text-gray-700 font-normal text-lg">{course.title}</span> */}
-              </h2>
+          {filteredCourses.map((course) => {
+            // Check if this course has matching faculty when searching by faculty
+            const hasMatchingFaculty = facultySearch && 
+              course.sections.some(section => facultyMatchesSearch(section.faculty, facultySearch));
+            
+            return (
+              <div key={course.code} className={`bg-white border-2 rounded-2xl shadow-lg p-4 sm:p-6 transition-transform hover:scale-[1.02] hover:shadow-2xl ${
+                hasMatchingFaculty ? 'border-purple-200 bg-purple-25' : 'border-blue-100'
+              }`}>
+                <h2 className="font-bold text-lg sm:text-2xl text-blue-700 mb-2 flex items-center gap-2">
+                  <span className="inline-block bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full text-base sm:text-xl font-semibold">{course.code}</span>
+                  {hasMatchingFaculty && (
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
+                      Faculty Match
+                    </span>
+                  )}
+                </h2>
               <ul className="space-y-2 sm:space-y-3 mt-2">
-                {course.sections.map((section) => (
-                  <li key={section.section} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-100 hover:bg-blue-100 transition">
-                    <div className="flex-1 w-full">
-                      <div className="font-semibold text-blue-800">Section {section.section} <span className="text-xs text-blue-500 ml-2">{section.faculty}</span></div>
-                      {section.times.map((time, idx) => (
-                        <div key={idx} className="text-xs text-gray-600 font-mono">
-                          {time.time}
+                {course.sections
+                  .filter(section => {
+                    // If faculty search is active, only show sections with matching faculty
+                    if (facultySearch) {
+                      return facultyMatchesSearch(section.faculty, facultySearch);
+                    }
+                    return true;
+                  })
+                  .map((section) => {
+                  // Highlight faculty name if searching by faculty
+                  const highlightFaculty = facultySearch && 
+                    facultyMatchesSearch(section.faculty, facultySearch);
+                  
+                  return (
+                    <li key={section.section} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-100 hover:bg-blue-100 transition">
+                      <div className="flex-1 w-full">
+                        <div className="font-semibold text-blue-800">
+                          Section {section.section} 
+                          <span className={`text-xs ml-2 ${highlightFaculty ? 'bg-yellow-200 text-purple-700 px-2 py-1 rounded-full font-bold' : 'text-blue-500'}`}>
+                            {formatFacultyDisplay(section.faculty)}
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                    <div className="flex gap-2 w-full sm:w-auto">
-                      <a
-                      href={`https://www.facebook.com/groups/161934770547464/search/?q=${course.code.toLowerCase()}%20${section.faculty.toLowerCase()}
+                        {section.times.map((time, idx) => (
+                          <div key={idx} className="text-xs text-gray-600 font-mono">
+                            {time.time}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex gap-2 w-full sm:w-auto">
+                        <a
+                        href={`https://www.facebook.com/groups/161934770547464/search/?q=${course.code.toLowerCase()}%20${getFacultyNames(section.faculty)[0]?.toLowerCase() || section.faculty.toLowerCase()}
 `}
-                       
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow hover:from-yellow-500 hover:to-orange-600 transition w-full sm:w-auto text-center"
-                      >
-                        Review
-                      </a>
-                      <button
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow hover:from-blue-600 hover:to-purple-600 transition w-full sm:w-auto"
-                        onClick={() => handleAddSection(course, section)}
-                      >
-                        Add
-                      </button>
-                    </div>
-                  </li>
-                ))}
+                         
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-gradient-to-r from-purple-500 to-purple-600  text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow hover:from-purple-600 hover:to-purple-700 transition w-full sm:w-auto text-center"
+                        >
+                          Review
+                        </a>
+                        <button
+                          className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow hover:from-green-600 hover:to-green-700 transition w-full sm:w-auto"
+                          onClick={() => handleAddSection(course, section)}
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
-          ))}
+          );
+          })}
         </div>
-        <div className="w-full md:w-1/2 lg:sticky top-4 self-start bg-white/90 p-4 sm:p-6 border-2 border-purple-200 rounded-2xl shadow-2xl backdrop-blur-lg max-h-[90vh] overflow-y-auto">
+        <div className="w-full md:w-1/2 lg:sticky top-50 self-start bg-white/90 p-4 sm:p-6 border-2 border-purple-200 rounded-2xl shadow-2xl backdrop-blur-lg max-h-[90vh] overflow-y-auto">
           <h2 className="font-bold mb-3 sm:mb-4 text-lg sm:text-xl text-purple-700 flex items-center gap-2">
             <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 sm:h-6 sm:w-6 text-purple-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 17v-2a4 4 0 018 0v2m-4-4v4m0 0v4m0-4H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-7z' /></svg>
-            Selected Courses
+            Current Selection
           </h2>
           {error && <div className="bg-red-100 text-red-700 p-2 sm:p-3 mb-3 sm:mb-4 rounded-lg border border-red-200 shadow text-sm sm:text-base">{error}</div>}
-          <ul className="space-y-2 sm:space-y-3">
+          
+          {/* Current Combination Name Input */}
+          <input
+            type="text"
+            placeholder="Combination name (optional)"
+            className="w-full mb-3 p-2 border-2 border-purple-200 rounded-lg shadow focus:outline-none focus:border-purple-400 bg-white text-sm"
+            value={currentCombinationName}
+            onChange={e => setCurrentCombinationName(e.target.value)}
+          />
+          
+          <ul className="space-y-2 sm:space-y-3 mb-4">
             {selectedSections.length === 0 && (
               <li className="text-gray-400 text-center">No courses selected.</li>
             )}
             {selectedSections.map((section) => (
               <li key={section.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-purple-50 rounded-lg p-2 sm:p-3 border border-purple-100 hover:bg-purple-100 transition">
                 <div className="flex-1 w-full">
-                  <div className="font-semibold text-purple-800">{section.courseCode} - Section {section.section} <span className="text-xs text-purple-500 ml-2">{section.faculty}</span></div>
+                  <div className="font-semibold text-purple-800">{section.courseCode} - Section {section.section} <span className="text-xs text-purple-500 ml-2">{formatFacultyDisplay(section.faculty)}</span></div>
                   {section.times.map((time, idx) => (
                     <div key={idx} className="text-xs text-gray-600 font-mono">
                       {time.time}
@@ -198,13 +613,65 @@ export default function CoursePlanner() {
               </li>
             ))}
           </ul>
-          <button
-            className="mt-4 sm:mt-6 w-full bg-gradient-to-r from-green-400 to-blue-500 text-white py-2 sm:py-3 rounded-xl font-bold shadow hover:from-green-500 hover:to-blue-600 transition text-base sm:text-lg"
-            onClick={() => setShowRoutine(true)}
-            disabled={selectedSections.length === 0}
-          >
-            Generate Routine
-          </button>
+          
+          {/* Action Buttons */}
+          <div className="space-y-2">
+            <button
+              className="w-full bg-gradient-to-r from-blue-400 to-indigo-500 text-white py-2 sm:py-2.5 rounded-xl font-bold shadow hover:from-blue-500 hover:to-indigo-600 transition text-sm sm:text-base"
+              onClick={handleSaveCombination}
+              disabled={selectedSections.length === 0}
+            >
+              Save as Combination
+            </button>
+          </div>
+
+          {/* Saved Combinations */}
+          {combinations.length > 0 && (
+            <div className="mt-6 pt-4 border-t border-purple-200">
+              <div className=" sm:flex-row gap-2 items-stretch mb-3">
+                <h3 className="font-bold text-purple-700 text-base sm:text-lg flex-1">Saved Combinations ({combinations.length})</h3>
+                <div className="flex gap-2 my-2">
+                  <button
+                    className="bg-gradient-to-r from-orange-400 to-red-500 text-white px-3 py-2 rounded-lg font-bold shadow hover:from-orange-500 hover:to-red-600 transition text-xs sm:text-sm flex-1 sm:flex-none"
+                    onClick={handleExportCombinations}
+                    data-export-btn
+                  >
+                    Export as Image
+                  </button>
+                  <button
+                    className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-2 rounded-lg font-bold shadow hover:from-purple-600 hover:to-indigo-700 transition text-xs sm:text-sm flex-1 sm:flex-none"
+                    onClick={handleViewAnalytics}
+                  >
+                    Analytics
+                  </button>
+                </div>
+              </div>
+              
+              <div id="combinations-list" className="space-y-3 max-h-60 overflow-y-auto bg-white p-3 rounded-lg border border-gray-200">
+                {combinations.map((combination, idx) => (
+                  <div key={combination.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-gray-800 text-sm">{combination.name}</h4>
+                      <button
+                        className="text-red-500 hover:text-red-700 text-xs"
+                        onClick={() => handleRemoveCombination(combination.id)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="text-xs text-gray-500 mb-2">Created: {combination.createdAt}</div>
+                    <div className="space-y-1">
+                      {combination.sections.map((section) => (
+                        <div key={section.id} className="text-xs text-gray-700">
+                          <span className="font-medium">{section.courseCode}</span> - Section {section.section} ({formatFacultyDisplay(section.faculty)})
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
