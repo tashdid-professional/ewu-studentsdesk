@@ -180,6 +180,17 @@ export default function Analytics() {
     };
   });
 
+  // Helper function to format faculty display (same as course planner)
+  const formatFacultyDisplay = (facultyString) => {
+    if (!facultyString) return '';
+    const names = facultyString.split(/[,/&]|\sand\s/i)
+      .map(name => name.trim())
+      .filter(name => name.length > 0);
+    if (names.length <= 1) return facultyString;
+    if (names.length === 2) return names.join(' & ');
+    return names.slice(0, -1).join(', ') + ' & ' + names[names.length - 1];
+  };
+
   // Export function
   const handleExportAnalytics = async () => {
     try {
@@ -192,15 +203,41 @@ export default function Analytics() {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       
+      // Determine layout based on number of combinations
+      const shouldUseTwoColumns = combinationDetails.length > 4;
+      const columnsCount = shouldUseTwoColumns ? 2 : 1;
+      const columnWidth = shouldUseTwoColumns ? 430 : 820;
+      const columnSpacing = 40;
+      
       // Calculate dynamic canvas height based on content
       let totalHeight = 150; // Header space
-      combinationDetails.forEach(combo => {
-        const coursesCount = combo.sections.length;
-        totalHeight += 80 + (coursesCount * 45) + 20; // Same calculation as course planner
-      });
+      
+      if (shouldUseTwoColumns) {
+        // Calculate height for two-column layout
+        const leftColumnCombinations = combinationDetails.filter((_, index) => index % 2 === 0);
+        const rightColumnCombinations = combinationDetails.filter((_, index) => index % 2 === 1);
+        
+        const leftColumnHeight = leftColumnCombinations.reduce((sum, combo) => {
+          const coursesCount = combo.sections.length;
+          return sum + 80 + (coursesCount * 45) + 20;
+        }, 0);
+        
+        const rightColumnHeight = rightColumnCombinations.reduce((sum, combo) => {
+          const coursesCount = combo.sections.length;
+          return sum + 80 + (coursesCount * 45) + 20;
+        }, 0);
+        
+        totalHeight += Math.max(leftColumnHeight, rightColumnHeight);
+      } else {
+        // Single column layout
+        combinationDetails.forEach(combo => {
+          const coursesCount = combo.sections.length;
+          totalHeight += 80 + (coursesCount * 45) + 20;
+        });
+      }
       
       // Set canvas size
-      canvas.width = 900; // Same as course planner
+      canvas.width = shouldUseTwoColumns ? 900 : 900;
       canvas.height = Math.max(600, totalHeight);
       
       // Fill background
@@ -233,77 +270,166 @@ export default function Analytics() {
       
       let yPosition = 140;
       
-      combinationDetails.forEach((combo, index) => {
-        const combinationHeight = 80 + (combo.sections.length * 45) + 20; // Same format as course planner
+      if (shouldUseTwoColumns) {
+        // Two-column layout
+        const leftColumnX = 20;
+        const rightColumnX = leftColumnX + columnWidth + columnSpacing;
+        let leftColumnY = yPosition;
+        let rightColumnY = yPosition;
         
-        // Combination background
-        ctx.fillStyle = '#f8fafc';
-        ctx.fillRect(30, yPosition, canvas.width - 60, combinationHeight);
-        
-        // Combination border
-        ctx.strokeStyle = '#d1d5db';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(30, yPosition, canvas.width - 60, combinationHeight);
-        
-        // Combination header background
-        ctx.fillStyle = '#e0e7ff';
-        ctx.fillRect(30, yPosition, canvas.width - 60, 60);
-        
-        // Combination name
-        ctx.fillStyle = '#3730a3';
-        ctx.font = 'bold 18px Arial, sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(`${index + 1}. ${combo.name}`, 45, yPosition + 25);
-        
-        // Analytics info
-        ctx.fillStyle = '#6366f1';
-        ctx.font = '12px Arial, sans-serif';
-        ctx.fillText(`Class Days: ${combo.classDays} | Total Hours: ${combo.totalHours}h | Max Gap: ${combo.maxGapHours}h`, 45, yPosition + 45);
-        
-        // Course count and creation date
-        ctx.fillStyle = '#059669';
-        ctx.font = 'bold 12px Arial, sans-serif';
-        ctx.textAlign = 'right';
-        ctx.fillText(`${combo.sections.length} courses`, canvas.width - 45, yPosition + 25);
-        
-        ctx.fillStyle = '#4338ca';
-        ctx.font = '10px Arial, sans-serif';
-        ctx.fillText(`Created: ${combo.createdAt}`, canvas.width - 45, yPosition + 45);
-        
-        let courseY = yPosition + 75;
-        
-        // Display all courses with full details (same as course planner format)
-        combo.sections.forEach((section, sIdx) => {
-          // Course header
-          ctx.fillStyle = '#1f2937';
-          ctx.font = 'bold 14px Arial, sans-serif';
+        combinationDetails.forEach((combo, index) => {
+          const isLeftColumn = index % 2 === 0;
+          const currentX = isLeftColumn ? leftColumnX : rightColumnX;
+          const currentY = isLeftColumn ? leftColumnY : rightColumnY;
+          
+          const combinationHeight = 60 + (combo.sections.length * 45) + 20;
+          
+          // Combination background
+          ctx.fillStyle = '#f8fafc';
+          ctx.fillRect(currentX, currentY, columnWidth, combinationHeight);
+          
+          // Combination border
+          ctx.strokeStyle = '#d1d5db';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(currentX, currentY, columnWidth, combinationHeight);
+          
+          // Combination header background
+          ctx.fillStyle = '#e0e7ff';
+          ctx.fillRect(currentX, currentY, columnWidth, 50);
+          
+          // Combination name
+          ctx.fillStyle = '#3730a3';
+          ctx.font = 'bold 16px Arial, sans-serif';
           ctx.textAlign = 'left';
-          ctx.fillText(`${sIdx + 1}. ${section.courseCode} - Section ${section.section}`, 50, courseY);
+          ctx.fillText(`${index + 1}. ${combo.name}`, currentX + 15, currentY + 25);
           
-          courseY += 20;
+          // Analytics info
+          ctx.fillStyle = '#6366f1';
+          ctx.font = '10px Arial, sans-serif';
+          ctx.fillText(`Days: ${combo.classDays} | Hours: ${combo.totalHours}h | Gap: ${combo.maxGapHours}h`, currentX + 15, currentY + 45);
           
-          // Faculty and times on the same line(s)
-          const facultyText = `Faculty: ${section.faculty}`;
-          const timesText = section.times.map(time => time.time).join(' | ');
-          
-          // Faculty name (left side)
-          ctx.fillStyle = '#4338ca';
-          ctx.font = '12px Arial, sans-serif';
-          ctx.fillText(facultyText, 70, courseY);
-          
-          // Measure faculty text width to position times
-          const facultyWidth = ctx.measureText(facultyText).width;
-          
-          // Times (right side, starting after faculty text)
+          // Course count and creation date
           ctx.fillStyle = '#059669';
-          ctx.font = '11px Arial, sans-serif';
-          ctx.fillText(`⏰ ${timesText}`, 70 + facultyWidth + 20, courseY);
+          ctx.font = 'bold 10px Arial, sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(`${combo.sections.length} courses`, currentX + columnWidth - 15, currentY + 25);
           
-          courseY += 25; // Space between courses
+          ctx.fillStyle = '#4338ca';
+          ctx.font = '9px Arial, sans-serif';
+          ctx.fillText(`Created: ${combo.createdAt}`, currentX + columnWidth - 15, currentY + 45);
+          
+          let courseY = currentY + 65;
+          
+          // Display courses
+          combo.sections.forEach((section, sIdx) => {
+            // Course header
+            ctx.fillStyle = '#1f2937';
+            ctx.font = 'bold 12px Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`${sIdx + 1}. ${section.courseCode} - Section ${section.section}`, currentX + 20, courseY);
+            
+            courseY += 18;
+            
+            // Faculty and times
+            const facultyText = `Faculty: ${formatFacultyDisplay(section.faculty)}`;
+            const timesText = section.times.map(time => time.time).join(' | ');
+            
+            // Faculty name
+            ctx.fillStyle = '#4338ca';
+            ctx.font = '10px Arial, sans-serif';
+            ctx.fillText(facultyText, currentX + 40, courseY);
+            
+            courseY += 12;
+            
+            // Times (on next line for better fit)
+            ctx.fillStyle = '#059669';
+            ctx.font = '9px Arial, sans-serif';
+            ctx.fillText(`⏰ ${timesText}`, currentX + 40, courseY);
+            
+            courseY += 15;
+          });
+          
+          // Update column Y positions
+          if (isLeftColumn) {
+            leftColumnY += combinationHeight + 20;
+          } else {
+            rightColumnY += combinationHeight + 20;
+          }
         });
-        
-        yPosition += combinationHeight + 20; // Space between combinations
-      });
+      } else {
+        // Single column layout (original)
+        combinationDetails.forEach((combo, index) => {
+          const combinationHeight = 60 + (combo.sections.length * 45) + 20;
+          
+          // Combination background
+          ctx.fillStyle = '#f8fafc';
+          ctx.fillRect(30, yPosition, canvas.width - 60, combinationHeight);
+          
+          // Combination border
+          ctx.strokeStyle = '#d1d5db';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(30, yPosition, canvas.width - 60, combinationHeight);
+          
+          // Combination header background
+          ctx.fillStyle = '#e0e7ff';
+          ctx.fillRect(30, yPosition, canvas.width - 60, 50);
+          
+          // Combination name
+          ctx.fillStyle = '#3730a3';
+          ctx.font = 'bold 18px Arial, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(`${index + 1}. ${combo.name}`, 45, yPosition + 25);
+          
+          // Analytics info
+          ctx.fillStyle = '#6366f1';
+          ctx.font = '12px Arial, sans-serif';
+          ctx.fillText(`Class Days: ${combo.classDays} | Total Hours: ${combo.totalHours}h | Max Gap: ${combo.maxGapHours}h`, 45, yPosition + 45);
+          
+          // Course count and creation date
+          ctx.fillStyle = '#059669';
+          ctx.font = 'bold 12px Arial, sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(`${combo.sections.length} courses`, canvas.width - 45, yPosition + 25);
+          
+          ctx.fillStyle = '#4338ca';
+          ctx.font = '10px Arial, sans-serif';
+          ctx.fillText(`Created: ${combo.createdAt}`, canvas.width - 45, yPosition + 45);
+          
+          let courseY = yPosition + 65;
+          
+          // Display all courses with full details
+          combo.sections.forEach((section, sIdx) => {
+            // Course header
+            ctx.fillStyle = '#1f2937';
+            ctx.font = 'bold 14px Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`${sIdx + 1}. ${section.courseCode} - Section ${section.section}`, 50, courseY);
+            
+            courseY += 20;
+            
+            // Faculty and times on the same line(s)
+            const facultyText = `Faculty: ${formatFacultyDisplay(section.faculty)}`;
+            const timesText = section.times.map(time => time.time).join(' | ');
+            
+            // Faculty name (left side)
+            ctx.fillStyle = '#4338ca';
+            ctx.font = '12px Arial, sans-serif';
+            ctx.fillText(facultyText, 70, courseY);
+            
+            // Measure faculty text width to position times
+            const facultyWidth = ctx.measureText(facultyText).width;
+            
+            // Times (right side, starting after faculty text)
+            ctx.fillStyle = '#059669';
+            ctx.font = '11px Arial, sans-serif';
+            ctx.fillText(`⏰ ${timesText}`, 70 + facultyWidth + 20, courseY);
+            
+            courseY += 25; // Space between courses
+          });
+          
+          yPosition += combinationHeight + 20; // Space between combinations
+        });
+      }
       
       // Add footer
       ctx.fillStyle = '#9ca3af';
@@ -408,7 +534,7 @@ export default function Analytics() {
                   <div className="space-y-1">
                     {combo.sections.map((section, idx) => (
                       <div key={idx} className="text-sm text-gray-600">
-                        {section.courseCode} - {section.faculty}
+                        {section.courseCode} - {formatFacultyDisplay(section.faculty)}
                       </div>
                     ))}
                   </div>
@@ -428,8 +554,8 @@ export default function Analytics() {
                             <div key={idx} className="bg-white rounded-lg p-3 shadow-sm">
                               <div className="font-semibold text-gray-800 text-sm">{classInfo.course}</div>
                               <div className="text-xs text-green-600 font-mono">{formatTime(classInfo.time)}</div>
-                              <div className="text-xs text-gray-500 truncate" title={classInfo.faculty}>
-                                {classInfo.faculty}
+                              <div className="text-xs text-gray-500 truncate" title={formatFacultyDisplay(classInfo.faculty)}>
+                                {formatFacultyDisplay(classInfo.faculty)}
                               </div>
                             </div>
                           ))}
