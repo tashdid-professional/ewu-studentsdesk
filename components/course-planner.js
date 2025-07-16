@@ -604,7 +604,16 @@ export default function CoursePlanner() {
         </div>
       </div>
       
-      <h1 className="pb-7 font-semibold"> N.B : For Reviews make sure you are logged in to your facebook account and added to EWU Faculty and Course Review group</h1>
+            <div className="flex items-center justify-center mb-4">
+            <span className="inline-block bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 text-blue-900 font-bold px-4 py-2 rounded-xl shadow border border-blue-300 text-lg tracking-wide">
+              Current Semester: <span className="text-indigo-700 font-extrabold ml-2">Summer-25</span>
+            </span>
+          </div>
+
+          <div className="pb-7 font-semibold text-center text-gray-600">
+            N.B.: For reviews, make sure you are logged in to your Facebook account and have joined the EWU Faculty and Course Review group. The course list will be updated once the new faculty list is released.
+          </div>
+      
       <div className="flex flex-col-reverse md:flex-row gap-6 md:gap-10 items-start">
         <div className="grid gap-4 sm:gap-6 md:gap-8 w-full md:w-2/3">
           {filteredCourses.length === 0 && (
