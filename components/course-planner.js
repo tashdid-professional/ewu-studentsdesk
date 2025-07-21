@@ -551,13 +551,13 @@ export default function CoursePlanner() {
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 sm:mb-8 text-center text-purple-800 drop-shadow-lg tracking-tight">Course Planner</h1>
       
       {/* Sticky Search Section */}
-      <div className="sticky top-15 z-20 bg-white/95 backdrop-blur-md border-2 border-blue-200 rounded-xl shadow-lg mb-6 sm:mb-8 p-4 transition-all duration-300">
+      <div className="sticky top-15 z-20 bg-white/95 backdrop-blur-md border-2 border-blue-200  shadow-lg mb-6 sm:mb-8 lg:p-4 py-2 px-1 transition-all duration-300">
         {/* Course Search */}
-        <div className="mb-3 flex gap-2">
+        <div className="lg:mb-3 mb-1 flex gap-2">
           <input
             type="text"
             placeholder="🔍 Search course code or title..."
-            className="w-full p-2 sm:p-3 border-2 border-blue-200 rounded-lg shadow focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white text-base sm:text-lg transition-all duration-200"
+            className="w-full p-2 sm:p-3 border-2 border-blue-200 rounded-lg shadow focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white text-xs sm:text-lg transition-all duration-200"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -567,7 +567,7 @@ export default function CoursePlanner() {
           <input
             type="text"
             placeholder="👨‍🏫 Search by faculty name..."
-            className="w-full p-2 sm:p-3 border-2 border-purple-200 rounded-lg shadow focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 bg-white text-base sm:text-lg transition-all duration-200"
+            className="w-full p-2 sm:p-3 border-2 border-purple-200 rounded-lg shadow focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 bg-white text-xs sm:text-lg transition-all duration-200"
             value={facultySearch}
             onChange={e => setFacultySearch(e.target.value)}
           />
@@ -575,7 +575,7 @@ export default function CoursePlanner() {
         
         {/* Search Results Info */}
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+          <div className="lg:text-sm text-[.6rem] text-gray-600">
             Found {filteredCourses.length} courses
             {search && ` matching course "${search}"`}
             {facultySearch && ` with faculty "${facultySearch}"`}
@@ -586,7 +586,7 @@ export default function CoursePlanner() {
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="text-xs bg-blue-200 hover:bg-blue-300 text-blue-700 px-2 py-1 rounded-full transition-colors duration-200"
+                  className="lg:text-xs text-[.6rem] bg-blue-200 hover:bg-blue-300 text-blue-700 px-2 py-1 rounded-full transition-colors duration-200"
                 >
                   Clear Course
                 </button>
@@ -614,8 +614,8 @@ export default function CoursePlanner() {
             N.B.: For reviews, make sure you are logged in to your Facebook account and have joined the EWU Faculty and Course Review group. The course list will be updated once the new faculty list is released.
           </div>
       
-      <div className="flex flex-col-reverse md:flex-row gap-6 md:gap-10 items-start">
-        <div className="grid gap-4 sm:gap-6 md:gap-8 w-full md:w-2/3">
+      <div className="flex  md:gap-10 lg:items-start">
+        <div className="grid gap-4 sm:gap-6 md:gap-8 w-[60%] md:w-2/3">
           {filteredCourses.length === 0 && (
             <div className="text-center text-gray-400 text-base sm:text-lg">No courses found.</div>
           )}
@@ -625,11 +625,11 @@ export default function CoursePlanner() {
               course.sections.some(section => facultyMatchesSearch(section.faculty, facultySearch));
             
             return (
-              <div key={course.code} className={`bg-white border-2 rounded-2xl shadow-lg p-4 sm:p-6 transition-transform hover:scale-[1.02] hover:shadow-2xl ${
+              <div key={course.code} className={`bg-white border-2 lg:w-full  shadow-lg p-2 sm:p-6 transition-transform hover:scale-[1.02] hover:shadow-2xl ${
                 hasMatchingFaculty ? 'border-purple-200 bg-purple-25' : 'border-blue-100'
               }`}>
-                <h2 className="font-bold text-lg sm:text-2xl text-blue-700 mb-2 flex items-center gap-2">
-                  <span className="inline-block bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full text-base sm:text-xl font-semibold">{course.code}</span>
+                <h2 className="font-bold lg:text-lg  text-sm text-blue-700 mb-2 flex items-center gap-2">
+                  <span className="inline-block bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full  lg:text-xl text-sm font-semibold">{course.code}</span>
                   {hasMatchingFaculty && (
                     <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
                       Faculty Match
@@ -651,7 +651,7 @@ export default function CoursePlanner() {
                     facultyMatchesSearch(section.faculty, facultySearch);
                   
                   return (
-                    <li key={section.section} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-100 hover:bg-blue-100 transition">
+                    <li key={section.section} className="flex flex-col text-xs  lg:text-base sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-100 hover:bg-blue-100 transition">
                       <div className="flex-1 w-full">
                         <div className="font-semibold text-blue-800">
                           Section {section.section} 
@@ -660,7 +660,7 @@ export default function CoursePlanner() {
                           </span>
                         </div>
                         {section.times.map((time, idx) => (
-                          <div key={idx} className="text-xs text-gray-600 font-mono">
+                          <div key={idx} className="lg:text-xs text-[0.7rem] text-gray-600 font-mono">
                             {time.time}
                           </div>
                         ))}
@@ -691,38 +691,38 @@ export default function CoursePlanner() {
           );
           })}
         </div>
-        <div className="w-full md:w-1/2 lg:sticky top-45 self-start bg-white/90 p-4 sm:p-6 border-2 border-purple-200 rounded-2xl shadow-2xl backdrop-blur-lg max-h-[70vh] overflow-y-auto">
-          <h2 className="font-bold mb-3 sm:mb-4 text-lg sm:text-xl text-purple-700 flex items-center gap-2">
+        <div className=" md:w-1/2 w-[40%] sticky lg:top-45 top-33 self-start bg-white/90 p-1 sm:p-6 border-2 border-purple-200  shadow-2xl backdrop-blur-lg max-h-[70vh] overflow-y-auto">
+          <h2 className="font-bold mb-3 sm:mb-4 text-sm sm:text-xl text-purple-700 flex items-center gap-2">
             <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 sm:h-6 sm:w-6 text-purple-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 17v-2a4 4 0 018 0v2m-4-4v4m0 0v4m0-4H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-7z' /></svg>
             Current Selection
           </h2>
-          {error && <div className="bg-red-100 text-red-700 p-2 sm:p-3 mb-3 sm:mb-4 rounded-lg border border-red-200 shadow text-sm sm:text-base">{error}</div>}
+          {error && <div className="bg-red-100 text-red-700 p-2 sm:p-3 mb-3 sm:mb-4 rounded-lg border border-red-200 shadow text-[.6rem] sm:text-base">{error}</div>}
           
           {/* Current Combination Name Input */}
           <input
             type="text"
             placeholder="Combination name (optional)"
-            className="w-full mb-3 p-2 border-2 border-purple-200 rounded-lg shadow focus:outline-none focus:border-purple-400 bg-white text-sm"
-            value={currentCombinationName}
+            className="w-full lg:mb-3 mb-1 p-2 border-2 border-purple-200 rounded-lg shadow focus:outline-none focus:border-purple-400 bg-white lg:text-sm text-xs"
+             value={currentCombinationName}
             onChange={e => setCurrentCombinationName(e.target.value)}
           />
           
           <ul className="space-y-2 sm:space-y-3 mb-4">
             {selectedSections.length === 0 && (
-              <li className="text-gray-400 text-center">No courses selected.</li>
+              <li className="text-gray-400 text-center lg:text-base text-xs">No courses selected.</li>
             )}
             {selectedSections.map((section) => (
-              <li key={section.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-purple-50 rounded-lg p-2 sm:p-3 border border-purple-100 hover:bg-purple-100 transition">
+              <li key={section.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-purple-50 rounded-lg p-1 sm:p-3 border border-purple-100 hover:bg-purple-100 transition">
                 <div className="flex-1 w-full">
-                  <div className="font-semibold text-purple-800">{section.courseCode} - Section {section.section} <span className="text-xs text-purple-500 ml-2">{formatFacultyDisplay(section.faculty)}</span></div>
+                  <div className="font-semibold text-purple-800 lg:text-base text-[.6rem]">{section.courseCode} - Sec {section.section} <span className="lg:text-xs text-[.6rem] text-purple-500 ml-2">{formatFacultyDisplay(section.faculty)}</span></div>
                   {section.times.map((time, idx) => (
-                    <div key={idx} className="text-xs text-gray-600 font-mono">
+                    <div key={idx} className="lg:text-xs text-[.6rem] text-gray-600 font-mono">
                       {time.time}
                     </div>
                   ))}
                 </div>
                 <button
-                  className="bg-gradient-to-r from-red-400 to-pink-500 text-white px-3 py-1 rounded-lg font-bold shadow hover:from-red-500 hover:to-pink-600 transition ml-0 sm:ml-2 w-full sm:w-auto"
+                  className="bg-gradient-to-r from-red-400 to-pink-500 text-white px-3 py-1 rounded-lg font-bold shadow hover:from-red-500 hover:to-pink-600 transition ml-0 sm:ml-2 w-full sm:w-auto lg:text-base text-[.6rem]"
                   onClick={() => {
                     setSelectedSections(selectedSections.filter(sel => sel.id !== section.id));
                     setError("");
@@ -737,7 +737,7 @@ export default function CoursePlanner() {
           {/* Action Buttons */}
           <div className="space-y-2">
             <button
-              className="w-full bg-gradient-to-r from-blue-400 to-indigo-500 text-white py-2 sm:py-2.5 rounded-xl font-bold shadow hover:from-blue-500 hover:to-indigo-600 transition text-sm sm:text-base"
+              className="w-full bg-gradient-to-r from-blue-400 to-indigo-500 text-white py-1 sm:py-2.5 rounded-xl font-bold shadow hover:from-blue-500 hover:to-indigo-600 transition text-[.6rem] sm:text-base"
               onClick={handleSaveCombination}
               disabled={selectedSections.length === 0}
             >
@@ -749,17 +749,17 @@ export default function CoursePlanner() {
           {combinations.length > 0 && (
             <div className="mt-6 pt-4 border-t border-purple-200">
               <div className=" sm:flex-row gap-2 items-stretch mb-3">
-                <h3 className="font-bold text-purple-700 text-base sm:text-lg flex-1">Saved Combinations ({combinations.length})</h3>
-                <div className="flex gap-2 my-2">
+                <h3 className="font-bold text-purple-700 text-xs sm:text-lg flex-1">Saved Combinations ({combinations.length})</h3>
+                <div className="flex gap-2 lg:flex-row flex-col my-2">
                   <button
-                    className="bg-gradient-to-r from-orange-400 to-red-500 text-white px-3 py-2 rounded-lg font-bold shadow hover:from-orange-500 hover:to-red-600 transition text-xs sm:text-sm flex-1 sm:flex-none"
+                    className="bg-gradient-to-r from-orange-400 to-red-500 text-white lg:px-3 px-1 py-2 rounded-lg font-bold shadow hover:from-orange-500 hover:to-red-600 transition text-[.6rem] sm:text-sm flex-1 sm:flex-none"
                     onClick={handleExportCombinations}
                     data-export-btn
                   >
                     Export as Image
                   </button>
                   <button
-                    className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-2 rounded-lg font-bold shadow hover:from-purple-600 hover:to-indigo-700 transition text-xs sm:text-sm flex-1 sm:flex-none"
+                    className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-2 rounded-lg font-bold shadow hover:from-purple-600 hover:to-indigo-700 transition text-[.6rem] sm:text-sm flex-1 sm:flex-none"
                     onClick={handleViewAnalytics}
                   >
                     Analytics
@@ -767,22 +767,22 @@ export default function CoursePlanner() {
                 </div>
               </div>
               
-              <div id="combinations-list" className="space-y-3  overflow-y-auto bg-white p-3 rounded-lg border border-gray-200">
+              <div id="combinations-list" className="space-y-3  overflow-y-auto bg-white lg:p-3 rounded-lg border border-gray-200">
                 {combinations.map((combination, idx) => (
                   <div key={combination.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-gray-800 text-sm">{combination.name}</h4>
+                      <h4 className="font-semibold text-gray-800 text-xs lg:text-sm">{combination.name}</h4>
                       <button
-                        className="text-red-500 hover:text-red-700 text-xs"
+                        className="text-red-500 hover:text-red-700 text-xs font-bold"
                         onClick={() => handleRemoveCombination(combination.id)}
                       >
                         ✕
                       </button>
                     </div>
-                    <div className="text-xs text-gray-500 mb-2">Created: {combination.createdAt}</div>
+                    <div className="text-xs lg:block hidden text-gray-500 mb-2">Created: {combination.createdAt}</div>
                     <div className="space-y-1">
                       {combination.sections.map((section) => (
-                        <div key={section.id} className="text-xs text-gray-700">
+                        <div key={section.id} className="lg:text-xs text-[.6rem] text-gray-700">
                           <span className="font-medium">{section.courseCode}</span> - Section {section.section} ({formatFacultyDisplay(section.faculty)})
                         </div>
                       ))}
