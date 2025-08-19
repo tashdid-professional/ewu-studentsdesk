@@ -528,18 +528,37 @@ export default function CoursePlanner() {
   };
 
   // Filter courses by search
+  // Helper to normalize course codes for robust search
+  const normalize = str => str.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
+  // Helper to check if search is a non-contiguous subsequence of code
+  function isSubsequence(search, code) {
+    let i = 0, j = 0;
+    while (i < search.length && j < code.length) {
+      if (search[i] === code[j]) i++;
+      j++;
+    }
+    return i === search.length;
+  }
+
   const filteredCourses = courses.filter(course => {
-    // Course search filter
-    const matchesCourseSearch = !search || 
-      course.code.toLowerCase().includes(search.toLowerCase()) ||
-      (course.title && course.title.toLowerCase().includes(search.toLowerCase()));
-    
+    if (!search && !facultySearch) return true;
+    const normalizedSearch = normalize(search);
+    const normalizedCode = normalize(course.code);
+    const normalizedTitle = course.title ? normalize(course.title) : '';
+
+    // Match if normalized search is in code, title, or is a non-contiguous subsequence of code
+    const matchesCourseSearch = !search ||
+      normalizedCode.includes(normalizedSearch) ||
+      normalizedTitle.includes(normalizedSearch) ||
+      isSubsequence(normalizedSearch, normalizedCode);
+
     // Faculty search filter - if faculty search is active, only show courses with matching faculty
-    const matchesFacultySearch = !facultySearch || 
-      course.sections.some(section => 
+    const matchesFacultySearch = !facultySearch ||
+      course.sections.some(section =>
         facultyMatchesSearch(section.faculty, facultySearch)
       );
-    
+
     return matchesCourseSearch && matchesFacultySearch;
   });
 
@@ -614,7 +633,7 @@ export default function CoursePlanner() {
       
             <div className="flex items-center justify-center mb-4">
             <span className="inline-block bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 text-blue-900 font-bold px-4 py-2 rounded-xl shadow border border-blue-300 text-lg tracking-wide">
-              Current Semester: <span className="text-indigo-700 font-extrabold ml-2">Summer-25</span>
+              Current List: <span className="text-indigo-700 font-extrabold ml-2">Spring-25</span>
             </span>
           </div>
 
