@@ -47,7 +47,15 @@ for (let i = headerRowIdx + 1; i < parsed.data.length; i++) {
   if (!code || !section || !faculty || !time) continue;
 
   if (!coursesMap[code]) coursesMap[code] = {};
-  if (!coursesMap[code][section]) coursesMap[code][section] = { faculty, times: [] };
+  if (!coursesMap[code][section]) {
+    coursesMap[code][section] = { faculty: faculty, times: [] };
+  } else {
+    // If faculty is not already included, add it
+    const faculties = coursesMap[code][section].faculty.split(' & ');
+    if (!faculties.includes(faculty)) {
+      coursesMap[code][section].faculty += ' & ' + faculty;
+    }
+  }
   coursesMap[code][section].times.push({ time });
 }
 
