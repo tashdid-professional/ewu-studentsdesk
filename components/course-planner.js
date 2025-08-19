@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { courses } from "../public/courses-data-new";
 import RoutinePage from "./routine-page";
 
@@ -57,6 +57,14 @@ export default function CoursePlanner() {
   const [showRoutine, setShowRoutine] = useState(false);
   const [combinations, setCombinations] = useState([]);
   const [currentCombinationName, setCurrentCombinationName] = useState("");
+  const topRef = useRef(null);
+
+  useEffect(() => {
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [search, facultySearch]);
+// ...existing code...
 
   const handleAddSection = (course, section) => {
     const sectionId = `${course.code}-${section.section}`;
@@ -547,7 +555,7 @@ export default function CoursePlanner() {
   }
 
   return (
-    <div className="max-w-5xl rounded-2xl mx-auto p-2 sm:p-4 md:p-8 relative min-h-screen">
+    <div ref={topRef} className="max-w-5xl rounded-2xl mx-auto p-2 sm:p-4 md:p-8 relative min-h-screen">
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 sm:mb-8 text-center text-purple-800 drop-shadow-lg tracking-tight">Course Planner</h1>
       
       {/* Sticky Search Section */}
