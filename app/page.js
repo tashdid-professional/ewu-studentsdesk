@@ -6,7 +6,7 @@ export default function Home() {
     <div className="min-h-screen  flex flex-col items-center justify-center p-4 pt-24">
       <div className="max-w-2xl w-full text-center mb-10">
         <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-800 mb-2 drop-shadow-lg">
-          East West University Ultimate Student's guide
+          East West University Ultimate Student&apos;s guide
         </h1>
         <p className="text-lg md:text-xl text-indigo-600 mb-6">
           Your all-in-one portal for planning, organizing, and excelling at EWU
