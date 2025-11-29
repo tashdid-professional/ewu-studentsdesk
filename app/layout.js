@@ -38,7 +38,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`antialiased bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex flex-col`}
+        className={`antialiased bg-gradient-to-br from-gray-900 via-gray-800 to-black min-h-screen flex flex-col`}
       >
         
         <main className="flex-grow">

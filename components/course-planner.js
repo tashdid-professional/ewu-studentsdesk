@@ -600,17 +600,17 @@ export default function CoursePlanner() {
   }
 
   return (
-    <div ref={topRef} className="max-w-5xl rounded-2xl mx-auto p-2 sm:p-4 md:p-8 relative min-h-screen">
-      <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 sm:mb-8 text-center text-purple-800 drop-shadow-lg tracking-tight">Course Planner</h1>
+    <div ref={topRef} className="max-w-5xl rounded-2xl mx-auto p-2 sm:p-4  relative min-h-screen ">
+      {/* <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 sm:mb-8 text-center text-white drop-shadow-lg tracking-tight">Course Planner</h1> */}
       
       {/* Sticky Search Section */}
-      <div className="sticky top-15 z-20 bg-white/95 backdrop-blur-md border-2 border-blue-200  shadow-lg mb-6 sm:mb-8 lg:p-4 py-2 px-1 transition-all duration-300">
+      <div className="sticky top-15 z-20 bg-gray-800/95 backdrop-blur-md border-2 border-gray-600 shadow-lg mb-6 sm:mb-8 lg:p-4 py-2 transition-all duration-300">
         {/* Course Search */}
         <div className="lg:mb-3 mb-1 flex gap-2">
           <input
             type="text"
             placeholder="🔍 Search course code or title..."
-            className="w-full p-2 sm:p-3 border-2 border-blue-200 rounded-lg shadow focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white text-xs sm:text-lg transition-all duration-200"
+            className="w-full p-2 sm:p-3 border-2 border-gray-600 rounded-lg shadow focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 bg-gray-700 text-white placeholder-gray-300 text-xs sm:text-lg transition-all duration-200"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -620,7 +620,7 @@ export default function CoursePlanner() {
           <input
             type="text"
             placeholder="👨‍🏫 Search by faculty name..."
-            className="w-full p-2 sm:p-3 border-2 border-purple-200 rounded-lg shadow focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 bg-white text-xs sm:text-lg transition-all duration-200"
+            className="w-full p-2 sm:p-3 border-2 border-gray-600 rounded-lg shadow focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 bg-gray-700 text-white placeholder-gray-300 text-xs sm:text-lg transition-all duration-200"
             value={facultySearch}
             onChange={e => setFacultySearch(e.target.value)}
           />
@@ -628,11 +628,12 @@ export default function CoursePlanner() {
         
         {/* Search Results Info */}
         <div className="flex items-center justify-between">
-          <div className="lg:text-sm text-[.6rem] text-gray-600">
+          <div className="lg:text-sm text-[.6rem] text-white">
             Found {filteredCourses.length} courses
             {search && ` matching course "${search}"`}
             {facultySearch && ` with faculty "${facultySearch}"`}
           </div>
+          <div><h1 className="text-white lg:text-sm text-[.6rem]">Current semester: Spring-25</h1></div>
           {/* Clear search buttons */}
           {(search || facultySearch) && (
             <div className="flex gap-2">
@@ -657,13 +658,9 @@ export default function CoursePlanner() {
         </div>
       </div>
       
-            <div className="flex items-center justify-center mb-4">
-            <span className="inline-block bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 text-blue-900 font-bold px-4 py-2 rounded-xl shadow border border-blue-300 text-lg tracking-wide">
-              Current List: <span className="text-indigo-700 font-extrabold ml-2">Spring-25</span>
-            </span>
-          </div>
+         
 
-          <div className="pb-7 font-semibold text-center text-gray-600">
+          <div className="pb-7 font-semibold text-center text-white lg:text-sm text-xs">
             N.B.: For reviews, make sure you are logged in to your Facebook account and have joined the EWU Faculty and Course Review group. The course list will be updated once the new faculty list is released.
           </div>
       
@@ -678,7 +675,7 @@ export default function CoursePlanner() {
               course.sections.some(section => facultyMatchesSearch(section.faculty, facultySearch));
             
             return (
-              <div key={course.code} className={`bg-white border-2 lg:w-full  shadow-lg p-2 sm:p-6 transition-transform hover:scale-[1.02] hover:shadow-2xl ${
+              <div key={course.code} className={`bg-white border-2 lg:w-full  shadow-lg p-2 sm:p-6 transition-transform  hover:shadow-2xl ${
                 hasMatchingFaculty ? 'border-purple-200 bg-purple-25' : 'border-blue-100'
               }`}>
                 <h2 className="font-bold lg:text-lg  text-sm text-blue-700 mb-2 flex items-center gap-2">

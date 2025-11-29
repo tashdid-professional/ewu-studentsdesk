@@ -1,7 +1,11 @@
 import Analytics from '../../../components/analytics';
 
 export default function AnalyticsPage() {
-  return <Analytics />;
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <Analytics />
+    </div>
+  );
 }
 
 export const metadata = {

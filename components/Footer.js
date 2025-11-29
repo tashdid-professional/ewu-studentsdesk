@@ -30,32 +30,35 @@ export default function Footer() {
   };
 
   return (
-    <footer className="mt-16 bg-gradient-to-r from-indigo-50 to-purple-50 border-t border-indigo-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <footer className="pt-16 bg-gradient-to-r from-gray-900 via-gray-800 to-black border-t border-gray-700 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]"></div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">EWU</span>
               </div>
-              <span className="text-xl font-bold text-indigo-800">Helpdesk</span>
+              <span className="text-xl font-bold text-white">Helpdesk</span>
             </div>
-            <p className="text-indigo-600 text-sm leading-relaxed">
+            <p className="text-gray-300 text-sm leading-relaxed">
               Your comprehensive portal for course planning, routine generation, and CGPA calculation. Built with care for EWU students.
             </p>
           </div>
 
           {/* Feedback Form */}
           <div className="space-y-4 w-[80%]">
-            <h3 className="text-indigo-800 font-semibold text-lg">Quick Feedback</h3>
+            <h3 className="text-white font-semibold text-lg">Quick Feedback</h3>
             <form onSubmit={handleSubmit} className="space-y-3">
               <div>
                 <textarea
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder="How can we improve this portal? Share your thoughts..."
-                  className="w-full px-3 py-2 text-sm border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 text-gray-100 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-300"
                   rows="3"
                   required
                 />
@@ -66,13 +69,13 @@ export default function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email "
-                  className="flex-1 px-3 py-2 text-sm border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2 text-sm bg-gray-800 border border-gray-600 text-gray-100 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   required
                 />
                 <button
                   type="submit"
                   disabled={isSubmitting || !feedback.trim()}
-                  className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 focus:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                 >
                   {isSubmitting ? 'Sending...' : 'Send'}
                 </button>
@@ -82,22 +85,22 @@ export default function Footer() {
 
           {/* Support & Contact */}
           <div className="space-y-4">
-            <h3 className="text-indigo-800 font-semibold text-lg">Contact</h3>
+            <h3 className="text-white font-semibold text-lg">Contact</h3>
             <div className="space-y-2">
-              <p className="text-indigo-600 text-sm">
+              <p className="text-gray-300 text-sm">
                  Get in touch with the developer!
               </p>
               <div className="flex space-x-4">
                 <a
                   href="mailto:tashdid.professional@gmail.com"
-                  className="text-indigo-600 hover:text-indigo-800 transition-colors"
+                  className="text-gray-400 hover:text-blue-400 transition-colors transform hover:scale-110 duration-300"
                   title="Email Support"
                 >
                   <FaEnvelope className="w-5 h-5" />
                 </a>
                 <a
                   href="https://github.com/ewu-helpdesk"
-                  className="text-indigo-600 hover:text-indigo-800 transition-colors"
+                  className="text-gray-400 hover:text-purple-400 transition-colors transform hover:scale-110 duration-300"
                   title="GitHub Repository"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -106,7 +109,7 @@ export default function Footer() {
                 </a>
                 <a
                   href="https://www.linkedin.com/in/habibur-rahman-tashdid/"
-                  className="text-indigo-600 hover:text-indigo-800 transition-colors"
+                  className="text-gray-400 hover:text-emerald-400 transition-colors transform hover:scale-110 duration-300"
                   title="LinkedIn"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -119,18 +122,18 @@ export default function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-indigo-200 mt-8 pt-6 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0">
-          <p className="text-indigo-500 text-sm">
-            © {currentYear} East West University Helpdesk. Developed by <a href="https://www.tashdid.online/" target='_blank'><span className='font-semibold underline'>Hasan Habibur Rahman</span></a>
+        <div className="border-t border-gray-700 mt-8 pt-6 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0">
+          <p className="text-gray-400 text-sm text-center">
+            © {currentYear} East West University Helpdesk. Developed by <a href="https://www.tashdid.online/" target='_blank'><span className='font-semibold underline text-blue-400 hover:text-blue-300 transition-colors'>Hasan Habibur Rahman</span></a>
           </p>
-          {/* <div className="flex space-x-6 text-xs text-indigo-500">
-            <Link href="/privacy" className="hover:text-indigo-700 transition-colors">
+          {/* <div className="flex space-x-6 text-xs text-gray-400">
+            <Link href="/privacy" className="hover:text-gray-200 transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="hover:text-indigo-700 transition-colors">
+            <Link href="/terms" className="hover:text-gray-200 transition-colors">
               Terms of Service
             </Link>
-            <Link href="/about" className="hover:text-indigo-700 transition-colors">
+            <Link href="/about" className="hover:text-gray-200 transition-colors">
               About
             </Link>
           </div> */}
