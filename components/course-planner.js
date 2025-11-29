@@ -540,16 +540,21 @@ export default function CoursePlanner() {
         const timeSlot = parts.slice(1).join(' '); // "10:10 AM - 11:40 AM"
         
         if (!timeGroups[timeSlot]) {
-          timeGroups[timeSlot] = [];
+          timeGroups[timeSlot] = new Set();
         }
-        timeGroups[timeSlot].push(days);
+        // Add each individual day to the set
+        for (const day of days) {
+          timeGroups[timeSlot].add(day);
+        }
       }
     });
     
-    // Combine days for same time slots
-    return Object.entries(timeGroups).map(([timeSlot, daysList]) => {
-      const combinedDays = daysList.join('');
-      return `${combinedDays} ${timeSlot}`;
+    // Combine days for same time slots with proper ordering
+    return Object.entries(timeGroups).map(([timeSlot, daysSet]) => {
+      // Define the proper day order: Saturday, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday
+      const dayOrder = ['S', 'U', 'M', 'T', 'W', 'R', 'F'];
+      const sortedDays = dayOrder.filter(day => daysSet.has(day)).join('');
+      return `${sortedDays} ${timeSlot}`;
     });
   };
 
