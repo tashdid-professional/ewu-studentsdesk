@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { courses } from "../public/courses-data-new";
+import { courses } from "../public/courses-data-updated";
 import RoutinePage from "./routine-page";
 
 function timeConflict(timeA, timeB) {

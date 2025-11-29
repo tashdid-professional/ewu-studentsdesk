@@ -5,8 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const Papa = require('papaparse');
 
-const csvPath = path.join(__dirname, 'public', 'newFacultyList.cleaned.csv');
-const outputPath = path.join(__dirname, 'public', 'courses-data-new.js');
+const csvPath = path.join(__dirname, 'public', 'faculty_list_spring-cleaned.csv');
+const outputPath = path.join(__dirname, 'public', 'courses-data-updated.js');
 
 
 const csvContent = fs.readFileSync(csvPath, 'utf8');
@@ -20,7 +20,7 @@ let headerRowIdx = -1;
 let headerMap = {};
 for (let i = 0; i < parsed.data.length; i++) {
   const row = parsed.data[i];
-  if (row.includes('Course') && row.includes('Section') && row.includes('Faculty')) {
+  if (row.includes('Course') && row.includes('Section') && row.includes('Faculty') && row.includes('Timing')) {
     headerRowIdx = i;
     row.forEach((col, idx) => {
       if (col) headerMap[col.trim()] = idx;
@@ -28,6 +28,9 @@ for (let i = 0; i < parsed.data.length; i++) {
     break;
   }
 }
+
+console.log('Header found at row:', headerRowIdx);
+console.log('Header mapping:', headerMap);
 
 if (headerRowIdx === -1) {
   console.error('Header row not found.');
