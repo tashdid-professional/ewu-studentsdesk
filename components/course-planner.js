@@ -270,7 +270,7 @@ export default function CoursePlanner() {
             
             // Faculty and times
             const facultyText = `Faculty: ${formatFacultyDisplay(section.faculty)}`;
-            const timesText = section.times.map(time => time.time).join(' | ');
+            const timesText = combineTimeSlots(section.times).join(' | ');
             
             // Faculty name
             ctx.fillStyle = '#4338ca';
@@ -343,7 +343,7 @@ export default function CoursePlanner() {
             
             // Faculty and times on the same line(s)
             const facultyText = `Faculty: ${formatFacultyDisplay(section.faculty)}`;
-            const timesText = section.times.map(time => time.time).join(' | ');
+            const timesText = combineTimeSlots(section.times).join(' | ');
             
             // Faculty name (left side)
             ctx.fillStyle = '#4338ca';
@@ -491,8 +491,8 @@ export default function CoursePlanner() {
       content += `   Courses:\n`;
       combination.sections.forEach(section => {
         content += `   • ${section.courseCode} - Section ${section.section} (${formatFacultyDisplay(section.faculty)})\n`;
-        section.times.forEach(time => {
-          content += `     ${time.time}\n`;
+        combineTimeSlots(section.times).forEach(combinedTime => {
+          content += `     ${combinedTime}\n`;
         });
       });
       content += '\n' + '-'.repeat(30) + '\n\n';
@@ -525,6 +525,32 @@ export default function CoursePlanner() {
     return facultyNames.some(name => 
       name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+  };
+
+  // Helper function to combine time slots with same time but different days
+  const combineTimeSlots = (times) => {
+    const timeGroups = {};
+    
+    times.forEach(timeObj => {
+      const timeString = timeObj.time;
+      const parts = timeString.split(' ');
+      
+      if (parts.length >= 5) {
+        const days = parts[0];
+        const timeSlot = parts.slice(1).join(' '); // "10:10 AM - 11:40 AM"
+        
+        if (!timeGroups[timeSlot]) {
+          timeGroups[timeSlot] = [];
+        }
+        timeGroups[timeSlot].push(days);
+      }
+    });
+    
+    // Combine days for same time slots
+    return Object.entries(timeGroups).map(([timeSlot, daysList]) => {
+      const combinedDays = daysList.join('');
+      return `${combinedDays} ${timeSlot}`;
+    });
   };
 
   // Filter courses by search
@@ -686,9 +712,9 @@ export default function CoursePlanner() {
                             {formatFacultyDisplay(section.faculty)}
                           </span>
                         </div>
-                        {section.times.map((time, idx) => (
+                        {combineTimeSlots(section.times).map((combinedTime, idx) => (
                           <div key={idx} className="lg:text-xs text-[0.7rem] text-gray-600 font-mono">
-                            {time.time}
+                            {combinedTime}
                           </div>
                         ))}
                       </div>
@@ -742,9 +768,9 @@ export default function CoursePlanner() {
               <li key={section.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-purple-50 rounded-lg p-1 sm:p-3 border border-purple-100 hover:bg-purple-100 transition">
                 <div className="flex-1 w-full">
                   <div className="font-semibold text-purple-800 lg:text-base text-[.6rem]">{section.courseCode} - Sec {section.section} <span className="lg:text-xs text-[.6rem] text-purple-500 ml-2">{formatFacultyDisplay(section.faculty)}</span></div>
-                  {section.times.map((time, idx) => (
+                  {combineTimeSlots(section.times).map((combinedTime, idx) => (
                     <div key={idx} className="lg:text-xs text-[.6rem] text-gray-600 font-mono">
-                      {time.time}
+                      {combinedTime}
                     </div>
                   ))}
                 </div>
