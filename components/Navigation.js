@@ -35,7 +35,7 @@ export default function Navigation() {
             </div>
             <div className="hidden sm:block">
               <span className="text-xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent group-hover:from-blue-200 group-hover:via-purple-200 group-hover:to-emerald-200 transition-all duration-300">
-                Student's Guide
+                Student&apos;s Guide
               </span>
               <div className="text-xs text-gray-400 -mt-1">East West University</div>
             </div>
