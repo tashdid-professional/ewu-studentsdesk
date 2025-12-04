@@ -139,7 +139,7 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="border-t border-gray-700 mt-8 pt-6 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0">
           <p className="text-gray-400 text-sm text-center">
-            © {currentYear} East West University Student's Desk. Developed by <span className='font-semibold  text-blue-400 hover:text-blue-300 transition-colors'>Hasan Habibur Rahman</span>
+            © {currentYear} East West University Student&apos;s Desk. Developed by <span className='font-semibold  text-blue-400 hover:text-blue-300 transition-colors'>Hasan Habibur Rahman</span>
           </p>
           {/* <div className="flex space-x-6 text-xs text-gray-400">
             <Link href="/privacy" className="hover:text-gray-200 transition-colors">
