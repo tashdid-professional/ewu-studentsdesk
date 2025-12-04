@@ -81,7 +81,7 @@ export default function Analytics() {
   const combinationDetails = combinations.map(combo => {
     // Create mini routine
     const schedule = {};
-    const dayMap = { 'M': 'Mon', 'T': 'Tue', 'W': 'Wed', 'R': 'Thu', 'F': 'Fri', 'S': 'Sat' };
+    const dayMap = { 'M': 'Mon', 'T': 'Tue', 'W': 'Wed', 'R': 'Thu', 'F': 'Fri', 'S': 'Sun' };
     
     combo.sections.forEach(section => {
       if (section.times && Array.isArray(section.times)) {
