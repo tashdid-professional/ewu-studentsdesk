@@ -11,18 +11,33 @@ export default function Footer() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!feedback.trim()) return;
+    if (!feedback.trim() || !email.trim()) return;
     
     setIsSubmitting(true);
     
-    // Simulate sending feedback (in a real app, you'd send this to your backend)
     try {
-      // For now, just show an alert and reset the form
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      alert('Thank you for your feedback! We appreciate your input.');
-      setFeedback('');
-      setEmail('');
+      // Using Formspree to send emails
+      const response = await fetch('https://formspree.io/f/xkgdznad', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          message: feedback,
+          _subject: 'EWU Helpdesk - New Feedback'
+        })
+      });
+
+      if (response.ok) {
+        alert('Thank you for your feedback! Your message has been sent successfully.');
+        setFeedback('');
+        setEmail('');
+      } else {
+        throw new Error('Failed to send message');
+      }
     } catch (error) {
+      console.error('Failed to send email:', error);
       alert('Sorry, there was an error sending your feedback. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -45,7 +60,7 @@ export default function Footer() {
               <span className="text-xl font-bold text-white">Helpdesk</span>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
-              Your comprehensive portal for course planning, routine generation, and CGPA calculation. Built with care for EWU students.
+              Your comprehensive portal for course planning, routine generation, and CGPA calculation.
             </p>
           </div>
 
@@ -99,7 +114,7 @@ export default function Footer() {
                   <FaEnvelope className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://github.com/ewu-helpdesk"
+                  href=""
                   className="text-gray-400 hover:text-purple-400 transition-colors transform hover:scale-110 duration-300"
                   title="GitHub Repository"
                   target="_blank"
@@ -108,7 +123,7 @@ export default function Footer() {
                   <FaGithub className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://www.linkedin.com/in/habibur-rahman-tashdid/"
+                  href=""
                   className="text-gray-400 hover:text-emerald-400 transition-colors transform hover:scale-110 duration-300"
                   title="LinkedIn"
                   target="_blank"
@@ -124,7 +139,7 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="border-t border-gray-700 mt-8 pt-6 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0">
           <p className="text-gray-400 text-sm text-center">
-            © {currentYear} East West University Helpdesk. Developed by <a href="https://www.tashdid.online/" target='_blank'><span className='font-semibold underline text-blue-400 hover:text-blue-300 transition-colors'>Hasan Habibur Rahman</span></a>
+            © {currentYear} East West University Student's Desk. Developed by <span className='font-semibold  text-blue-400 hover:text-blue-300 transition-colors'>Hasan Habibur Rahman</span>
           </p>
           {/* <div className="flex space-x-6 text-xs text-gray-400">
             <Link href="/privacy" className="hover:text-gray-200 transition-colors">
