@@ -376,106 +376,205 @@ function RoutineGenerator() {
         throw new Error('No schedule data available to export');
       }
 
-      // Try to dynamically import html2canvas
-      let html2canvas;
-      try {
-        html2canvas = (await import('html2canvas')).default;
-      } catch (importError) {
-        console.error('Failed to import html2canvas:', importError);
-        throw new Error('html2canvas library could not be loaded. Please refresh the page.');
-      }
-      
-      console.log('Starting image export...');
+      console.log('Starting Canvas API image export...');
 
-      // Create a clean export version
-      const exportContainer = document.createElement('div');
-      exportContainer.style.cssText = `
-        position: fixed;
-        left: -9999px;
-        top: 0;
-        background: white;
-        padding: 30px;
-        width: 1200px;
-        min-height: 800px;
-        font-family: Arial, sans-serif;
-        box-sizing: border-box;
-        z-index: 9999;
-      `;
-      
-      // Generate clean HTML for export
-      exportContainer.innerHTML = `
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2563eb; padding-bottom: 20px;">
-          <h1 style="color: #2563eb; font-size: 36px; margin: 0 0 10px 0; font-weight: bold;">Weekly Class Schedule</h1>
-          <p style="color: #6b7280; font-size: 20px; margin: 0;">East West University</p>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(${Math.min(days.length, 3)}, 1fr); gap: 25px; margin: 0;">
-          ${days.map(day => `
-            <div style="border: 2px solid #e5e7eb; border-radius: 20px; overflow: hidden; background: #f8fafc; box-shadow: 0 8px 25px rgba(0,0,0,0.1); min-height: 300px;">
-              <div style="background: #2563eb; color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 20px;">
-                ${dayNames[day]}
-              </div>
-              <div style="padding: 20px;">
-                ${weeklySchedule[day].map(cls => `
-                  <div style="background: white; margin-bottom: 15px; padding: 18px; border-radius: 15px; border-left: 5px solid #2563eb; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
-                    <div style="font-weight: bold; color: #1e40af; font-size: 18px; margin-bottom: 10px; line-height: 1.2;">${cls.course}</div>
-                    <div style="font-size: 15px; color: #6b7280; line-height: 1.5;">
-                      <div style="margin-bottom: 6px;"><span style="font-weight: 600;">Section:</span> ${cls.section || 'TBA'}</div>
-                      <div style="color: #2563eb; font-weight: bold; margin-bottom: 6px; font-size: 16px;"><span style="font-weight: 600;">Time:</span> ${cls.time}</div>
-                      <div><span style="font-weight: 600;">Room:</span> ${cls.room || 'TBA'}</div>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-        
-        <div style="text-align: center; margin-top: 40px; padding-top: 25px; border-top: 2px solid #e5e7eb; color: #6b7280; font-size: 16px;">
-          Generated on ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-        </div>
-      `;
-      
-      document.body.appendChild(exportContainer);
-
-      // Wait longer for content to fully render
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      console.log('Export container dimensions:', exportContainer.offsetWidth, 'x', exportContainer.offsetHeight);
-
-      // Create canvas with optimized options
-      const canvas = await html2canvas(exportContainer, {
-        backgroundColor: '#ffffff',
-        scale: 1.5,
-        useCORS: true,
-        allowTaint: false,
-        logging: true,
-        width: exportContainer.offsetWidth,
-        height: exportContainer.offsetHeight,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: exportContainer.offsetWidth,
-        windowHeight: exportContainer.offsetHeight
-      });
-
-      console.log('Canvas created successfully:', canvas.width, 'x', canvas.height);
-
-      // Verify canvas has content
+      // Create canvas directly using Canvas API (bypass html2canvas completely)
+      const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const hasContent = imageData.data.some((channel, index) => {
-        // Check if any pixel is not white/transparent
-        return index % 4 < 3 && channel < 250; // RGB channels, not alpha
-      });
-
-      console.log('Canvas has content:', hasContent);
-
-      // Remove temporary element
-      document.body.removeChild(exportContainer);
-
-      if (!hasContent) {
-        throw new Error('Generated image appears to be blank. This might be a browser compatibility issue.');
+      
+      // Calculate optimal canvas dimensions
+      const maxClassesPerDay = Math.max(...days.map(day => weeklySchedule[day].length));
+      const columns = Math.min(days.length, 3);
+      const rows = Math.ceil(days.length / columns);
+      
+      canvas.width = 1400;
+      canvas.height = Math.max(900, 250 + rows * (120 + maxClassesPerDay * 90));
+      
+      // Create gradient background
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, '#f8fafc');
+      gradient.addColorStop(1, '#e2e8f0');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Add subtle pattern overlay
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      for (let i = 0; i < canvas.width; i += 60) {
+        for (let j = 0; j < canvas.height; j += 60) {
+          ctx.fillRect(i, j, 30, 30);
+        }
       }
+      
+      // Header with enhanced styling
+      const headerY = 60;
+      
+      // Header background with rounded rectangle effect
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetY = 5;
+      ctx.fillRect(50, 20, canvas.width - 100, 100);
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+      
+      // Header border
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(50, 20, canvas.width - 100, 100);
+      
+      // Title with gradient effect
+      const titleGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+      titleGradient.addColorStop(0, '#1e40af');
+      titleGradient.addColorStop(1, '#3b82f6');
+      ctx.fillStyle = titleGradient;
+      ctx.font = 'bold 42px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('📅 Weekly Class Schedule', canvas.width / 2, headerY);
+      
+      // Subtitle
+      ctx.fillStyle = '#64748b';
+      ctx.font = '24px Arial, sans-serif';
+      ctx.fillText('East West University', canvas.width / 2, headerY + 35);
+      
+      let yPosition = 160;
+      const columnWidth = Math.min(420, (canvas.width - 120) / columns);
+      const columnGap = 30;
+      const startX = (canvas.width - (columns * columnWidth + (columns - 1) * columnGap)) / 2;
+      
+      // Draw schedule for each day with enhanced styling
+      days.forEach((day, dayIndex) => {
+        const columnIndex = dayIndex % columns;
+        const rowIndex = Math.floor(dayIndex / columns);
+        const x = startX + columnIndex * (columnWidth + columnGap);
+        const y = yPosition + rowIndex * (120 + maxClassesPerDay * 90);
+        
+        const dayContentHeight = weeklySchedule[day].length * 90 + 60;
+        const totalDayHeight = 60 + dayContentHeight;
+        
+        // Day column shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+        ctx.shadowBlur = 25;
+        ctx.shadowOffsetY = 8;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(x, y, columnWidth, totalDayHeight);
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+        
+        // Day column border with rounded corners effect
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, columnWidth, totalDayHeight);
+        
+        // Day header with gradient
+        const dayGradient = ctx.createLinearGradient(x, y, x + columnWidth, y + 60);
+        dayGradient.addColorStop(0, '#3b82f6');
+        dayGradient.addColorStop(1, '#1d4ed8');
+        ctx.fillStyle = dayGradient;
+        ctx.fillRect(x, y, columnWidth, 60);
+        
+        // Day header top border highlight
+        ctx.fillStyle = '#60a5fa';
+        ctx.fillRect(x, y, columnWidth, 3);
+        
+        // Day name with better typography
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(dayNames[day], x + columnWidth / 2, y + 38);
+        
+        // Day content area
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(x, y + 60, columnWidth, dayContentHeight);
+        
+        // Classes for this day with enhanced cards
+        weeklySchedule[day].forEach((cls, classIndex) => {
+          const classY = y + 85 + classIndex * 90;
+          const cardHeight = 80;
+          
+          // Class card shadow
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
+          ctx.shadowBlur = 15;
+          ctx.shadowOffsetY = 4;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(x + 15, classY, columnWidth - 30, cardHeight);
+          ctx.shadowColor = 'transparent';
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetY = 0;
+          
+          // Class card border
+          ctx.strokeStyle = '#e2e8f0';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x + 15, classY, columnWidth - 30, cardHeight);
+          
+          // Left accent bar with gradient
+          const accentGradient = ctx.createLinearGradient(x + 15, classY, x + 15, classY + cardHeight);
+          accentGradient.addColorStop(0, '#3b82f6');
+          accentGradient.addColorStop(1, '#1e40af');
+          ctx.fillStyle = accentGradient;
+          ctx.fillRect(x + 15, classY, 6, cardHeight);
+          
+          // Course name with better styling
+          ctx.fillStyle = '#1e293b';
+          ctx.font = 'bold 18px Arial, sans-serif';
+          ctx.textAlign = 'left';
+          const courseText = cls.course.length > 32 ? cls.course.substring(0, 32) + '...' : cls.course;
+          ctx.fillText(courseText, x + 35, classY + 22);
+          
+          // Section info
+          ctx.fillStyle = '#64748b';
+          ctx.font = '14px Arial, sans-serif';
+          ctx.fillText(`📚 Section: ${cls.section || 'TBA'}`, x + 35, classY + 42);
+          
+          // Time with clock icon
+          ctx.fillStyle = '#2563eb';
+          ctx.font = 'bold 14px Arial, sans-serif';
+          ctx.fillText(`⏰ ${cls.time}`, x + 35, classY + 58);
+          
+          // Room info
+          ctx.fillStyle = '#64748b';
+          ctx.font = '14px Arial, sans-serif';
+          ctx.fillText(`📍 Room: ${cls.room || 'TBA'}`, x + 35, classY + 74);
+        });
+      });
+      
+      // Enhanced footer
+      const footerY = canvas.height - 60;
+      
+      // Footer background
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+      ctx.shadowBlur = 15;
+      ctx.shadowOffsetY = -3;
+      ctx.fillRect(50, footerY - 20, canvas.width - 100, 60);
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+      
+      // Footer border
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(50, footerY - 20, canvas.width - 100, 60);
+      
+      // Generated date
+      ctx.fillStyle = '#64748b';
+      ctx.font = '16px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      const currentDate = new Date().toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      ctx.fillText(`📅 Generated on ${currentDate}`, canvas.width / 2, footerY + 5);
+      
+      // Website branding
+      ctx.fillStyle = '#3b82f6';
+      ctx.font = 'bold 18px Arial, sans-serif';
+      ctx.fillText('🎓 EWU Student\'s Desk', canvas.width / 2, footerY + 25);
+      
+      console.log('Canvas created successfully:', canvas.width, 'x', canvas.height);
 
       // Convert to blob and download
       return new Promise((resolve, reject) => {
@@ -510,12 +609,8 @@ function RoutineGenerator() {
       
       // Provide specific error messages
       let errorMessage = 'Failed to export as image:\n\n';
-      if (error.message.includes('html2canvas')) {
-        errorMessage += '🔧 Image library failed to load. Please refresh the page and try again.';
-      } else if (error.message.includes('No schedule data')) {
+      if (error.message.includes('No schedule data')) {
         errorMessage += '📊 No schedule data available. Please upload an advising slip first.';
-      } else if (error.message.includes('blank')) {
-        errorMessage += '🖼️ The generated image appears blank. This might be due to browser security restrictions or compatibility issues.';
       } else if (error.message.includes('blob')) {
         errorMessage += '🖼️ Image generation failed due to browser restrictions.';
       } else {
