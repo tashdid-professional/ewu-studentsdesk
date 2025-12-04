@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata = {
   title: "EWU Helpdesk - Course Planning, Routine Generation & CGPA Calculator",
