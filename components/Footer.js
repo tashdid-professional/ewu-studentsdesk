@@ -57,7 +57,7 @@ export default function Footer() {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">EWU</span>
               </div>
-              <span className="text-xl font-bold text-white">Student's Desk</span>
+              <span className="text-xl font-bold text-white">Student&apos;s Desk</span>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Your comprehensive portal for course planning, routine generation, and CGPA calculation.
