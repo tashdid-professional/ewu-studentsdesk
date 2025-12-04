@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const Papa = require('papaparse');
 
-const csvPath = path.join(__dirname, 'public', 'faculty_list_spring-cleaned.csv');
+const csvPath = path.join(__dirname, 'public', 'faculty_list_spring-cleaned-new.csv');
 const outputPath = path.join(__dirname, 'public', 'courses-data-updated.js');
 
 

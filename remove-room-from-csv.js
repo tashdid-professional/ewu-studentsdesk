@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const Papa = require('papaparse');
 
-const inputPath = path.join(__dirname, 'public', 'faculty_list_spring.csv');
-const outputPath = path.join(__dirname, 'public', 'faculty_list_spring-cleaned.csv');
+const inputPath = path.join(__dirname, 'public', 'newFacultyList.csv');
+const outputPath = path.join(__dirname, 'public', 'newFacultyList-cleaned.csv');
 
 try {
   const content = fs.readFileSync(inputPath, 'utf8');
