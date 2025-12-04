@@ -83,7 +83,7 @@ function formatNewCSV() {
         
       } else {
         // Format 2: Standard format
-        // col2 contains courseCode+section+faculty (e.g., "1011MAR" or "10110TZE")
+        // col2 contains courseCode+section+faculty (e.g., "1011MAR" or "10110TZE" or "72261TMD")
         const match2 = col2.match(/^(\d+)([A-Z]+.*)$/);
         
         if (match2) {
@@ -91,16 +91,29 @@ function formatNewCSV() {
           faculty = match2[2];
           
           // Extract course code and section
-          if (digits.length >= 4) {
+          // Evening courses start with "7" and have 4-digit codes (e.g., "7226")
+          if (digits.startsWith('7') && digits.length === 5) {
+            // Evening course: "72261" -> course="7226", section="1"
+            courseCode = digits.substring(0, 4);  // First 4 digits
+            section = digits.substring(4);         // Last 1 digit
+          } else if (digits.startsWith('7') && digits.length === 6) {
+            // Evening course with 2-digit section: "722610" -> course="7226", section="10"
+            courseCode = digits.substring(0, 4);  // First 4 digits
+            section = digits.substring(4);         // Last 2 digits
+          } else if (digits.length === 4) {
+            // Regular course: "1011" -> course="101", section="1"
             courseCode = digits.substring(0, 3);  // First 3 digits
-            section = digits.substring(3);         // Remaining 1-2 digits
+            section = digits.substring(3);         // Last 1 digit
+          } else if (digits.length === 5) {
+            // Regular course with 2-digit section: "10110" -> course="101", section="10"
+            courseCode = digits.substring(0, 3);  // First 3 digits
+            section = digits.substring(3);         // Last 2 digits
           } else if (digits.length === 3) {
             courseCode = digits;
             section = '1';  // Default to section 1 if not specified
           } else {
-            // Less than 3 digits, treat whole thing as section
-            section = digits;
-            continue;  // Skip malformed entries
+            // Can't determine, skip
+            continue;
           }
           
           // col3 contains capacity+timing
