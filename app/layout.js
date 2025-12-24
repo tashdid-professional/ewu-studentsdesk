@@ -2,6 +2,7 @@ import "./globals.css";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { Analytics } from "@vercel/analytics/next"
+import Script from 'next/script'
 
 export const metadata = {
   title: "EWU Helpdesk - Course Planning, Routine Generation & CGPA Calculator",
@@ -38,6 +39,18 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-DXXZRKZ1MN"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-DXXZRKZ1MN');
+        `}
+      </Script>
       <body
         className={`antialiased bg-gradient-to-br from-gray-900 via-gray-800 to-black min-h-screen flex flex-col`}
       >
