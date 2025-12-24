@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import Script from 'next/script'
 
 export const metadata = {
-  title: "EWU Helpdesk - Course Planning, Routine Generation & CGPA Calculator",
+  title: "EWU Student's Desk - Course Planning, Routine Generation & CGPA Calculator",
   description: "Your comprehensive portal for East West University course planning, routine generation, and CGPA calculation. Built for EWU students.",
   icons: {
     icon: [
