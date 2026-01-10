@@ -638,7 +638,7 @@ export default function CoursePlanner() {
             {search && ` matching course "${search}"`}
             {facultySearch && ` with faculty "${facultySearch}"`}
           </div>
-          <div><h1 className="text-white lg:text-sm text-[.6rem]">Last updated : 4-12-25</h1></div>
+          <div><h1 className="text-white lg:text-sm text-[.6rem]">Last updated : 10-1-26</h1></div>
           <div><h1 className="text-white lg:text-sm text-[.6rem]">Current semester: Spring-25</h1></div>
           {/* Clear search buttons */}
           {(search || facultySearch) && (
@@ -666,8 +666,8 @@ export default function CoursePlanner() {
       
          
 
-          <div className="pb-7 font-semibold text-center text-white lg:text-sm text-xs">
-            N.B.: For reviews, make sure you are logged in to your Facebook account and have joined the EWU Faculty and Course Review group. The course list will be updated once the new faculty list is released.
+          <div className="pb-7 font-semibold text-center text-white lg:text-xs text-[0.6rem]">
+            N.B.: For reviews, make sure you are logged in to your Facebook account and have joined the EWU Faculty and Course Review group. Always recheck with the official advising list before finalizing your course selection.
           </div>
       
       <div className="flex  md:gap-10 lg:items-start">
