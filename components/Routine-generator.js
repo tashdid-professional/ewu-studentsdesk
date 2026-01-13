@@ -210,21 +210,77 @@ function RoutineGenerator() {
                 const prevSection = prevRow && secIdx > -1 && prevRow[secIdx] ? prevRow[secIdx].toString().trim() : '';
                 
                 if (prevCourse && /^[A-Z]{2,4}\d{3,4}/.test(prevCourse)) {
-                  // Check if current row is actually a lab by looking at room or course name indicators
-                  const isLab = room && (
-                    room.toLowerCase().includes('lab') || 
-                    room.toLowerCase().includes('electronics') ||
-                    room.toLowerCase().includes('computer')
-                  );
+                  // Helper function to calculate time duration in minutes
+                  const getTimeDuration = (timeStr) => {
+                    if (!timeStr) return 0;
+                    const parts = timeStr.split('-');
+                    if (parts.length !== 2) return 0;
+                    
+                    const parseTime = (t) => {
+                      const [time, period] = t.trim().split(/([AP]M)/);
+                      let [hours, minutes] = time.split(':').map(Number);
+                      if (period === 'PM' && hours !== 12) hours += 12;
+                      if (period === 'AM' && hours === 12) hours = 0;
+                      return hours * 60 + minutes;
+                    };
+                    
+                    try {
+                      const startMinutes = parseTime(parts[0]);
+                      const endMinutes = parseTime(parts[1]);
+                      return endMinutes - startMinutes;
+                    } catch (e) {
+                      console.warn('Error calculating duration:', timeStr, e);
+                      return 0;
+                    }
+                  };
                   
-                  // Also check if this row explicitly mentions "lab" in the original course field
-                  const originalCourseField = row[courseIdx] ? row[courseIdx].toString().trim().toLowerCase() : '';
-                  const hasLabInName = originalCourseField.includes('lab');
-                  
-                  if (isLab || hasLabInName) {
-                    courseName = prevCourse + ' Lab';
-                  } else {
-                    // It's likely another time slot for the same course, not a lab
+                  try {
+                    // Find all durations for this course code across all rows
+                    const courseDurations = [];
+                    for (let checkIdx = 0; checkIdx < courseRows.length; checkIdx++) {
+                      const checkRow = courseRows[checkIdx];
+                      const checkCourse = checkRow && checkRow[courseIdx] ? checkRow[courseIdx].toString().trim() : '';
+                      const checkTimeSlot = checkRow && checkRow[timeIdx] ? checkRow[timeIdx].toString().trim() : '';
+                      
+                      // If this row has the same course code or empty course (inheriting from previous)
+                      if (checkCourse === prevCourse || (!checkCourse && checkIdx > prevIdx)) {
+                        const duration = getTimeDuration(checkTimeSlot);
+                        if (duration > 0) {
+                          courseDurations.push(duration);
+                        }
+                      }
+                    }
+                    
+                    // Find the most common duration (that's the regular class)
+                    let mostCommonDuration = 0;
+                    if (courseDurations.length > 0) {
+                      const durationCounts = {};
+                      courseDurations.forEach(d => {
+                        durationCounts[d] = (durationCounts[d] || 0) + 1;
+                      });
+                      
+                      mostCommonDuration = Object.keys(durationCounts).reduce((a, b) => 
+                        durationCounts[a] > durationCounts[b] ? a : b
+                      );
+                      mostCommonDuration = parseInt(mostCommonDuration);
+                    }
+                    
+                    // Get current row's duration
+                    const currentDuration = getTimeDuration(timeSlot);
+                    
+                    // Check if duration is significantly different from the most common one
+                    const durationDiff = mostCommonDuration > 0 ? Math.abs(currentDuration - mostCommonDuration) : 0;
+                    const hasDifferentDuration = durationDiff > 30; // More than 30 min difference suggests lab
+                    
+                    // If duration is different, it's definitely a lab
+                    if (hasDifferentDuration && mostCommonDuration > 0) {
+                      courseName = prevCourse + ' Lab';
+                    } else {
+                      // If duration is the same as most common, it's NOT a lab
+                      courseName = prevCourse;
+                    }
+                  } catch (durErr) {
+                    console.warn('Error in duration logic:', durErr);
                     courseName = prevCourse;
                   }
                   
@@ -331,6 +387,12 @@ function RoutineGenerator() {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        
+        if (!json || json.length === 0) {
+          setError("The Excel file is empty or could not be read. Please check your file.");
+          return;
+        }
+        
         const formatted = formatRoutine(json);
         if (formatted) {
           setRoutine(formatted);
@@ -338,8 +400,22 @@ function RoutineGenerator() {
         }
       } catch (err) {
         console.error("File parsing error:", err);
-        setError("Failed to parse Excel file. Please ensure it's a valid .xlsx or .xls file and not corrupted.");
+        console.error("Error stack:", err.stack);
+        
+        let errorMsg = "Failed to parse Excel file. ";
+        if (err.message.includes('Invalid file')) {
+          errorMsg += "The file format is not supported.";
+        } else if (err.message.includes('header')) {
+          errorMsg += "Could not find required columns (Course(s) and Time-WeekDay).";
+        } else {
+          errorMsg += "Please ensure it's a valid .xlsx or .xls file and not corrupted.";
+        }
+        
+        setError(errorMsg);
       }
+    };
+    reader.onerror = () => {
+      setError("Failed to read the file. Please try again.");
     };
     reader.readAsArrayBuffer(file);
   };
