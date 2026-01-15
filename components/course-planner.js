@@ -118,7 +118,6 @@ export default function CoursePlanner() {
     };
     
     setCombinations([...combinations, newCombination]);
-    setSelectedSections([]);
     setCurrentCombinationName("");
     setError("");
   };
@@ -747,9 +746,9 @@ export default function CoursePlanner() {
           );
           })}
         </div>
-        <div className=" md:w-1/2 w-[40%] sticky lg:top-45 top-33 self-start bg-white/90 p-1 sm:p-6 border-2 border-purple-200  shadow-2xl backdrop-blur-lg max-h-[70vh] overflow-y-auto">
-          <h2 className="font-bold mb-3 sm:mb-4 text-sm sm:text-xl text-purple-700 flex items-center gap-2">
-            <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 sm:h-6 sm:w-6 text-purple-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 17v-2a4 4 0 018 0v2m-4-4v4m0 0v4m0-4H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-7z' /></svg>
+        <div className=" md:w-1/2 w-[40%] sticky lg:top-45 top-33 self-start bg-white p-1 sm:p-6 border-2 border-purple-200  shadow-2xl backdrop-blur-lg max-h-[70vh] overflow-y-auto">
+          <h2 className="font-bold mb-3 sm:mb-4 text-sm sm:text-xl  flex items-center gap-2">
+            {/* <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 sm:h-6 sm:w-6 ' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 17v-2a4 4 0 018 0v2m-4-4v4m0 0v4m0-4H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-7z' /></svg> */}
             Current Selection
           </h2>
           {error && <div className="bg-red-100 text-red-700 p-2 sm:p-3 mb-3 sm:mb-4 rounded-lg border border-red-200 shadow text-[.6rem] sm:text-base">{error}</div>}

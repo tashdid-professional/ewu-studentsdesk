@@ -700,7 +700,7 @@ function RoutineGenerator() {
       if (buttonElement) {
         buttonElement.textContent = 'Export as Image';
         buttonElement.disabled = false;
-      }dad 
+      }
     }
   };
 
