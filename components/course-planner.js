@@ -57,6 +57,7 @@ export default function CoursePlanner() {
   const [showRoutine, setShowRoutine] = useState(false);
   const [combinations, setCombinations] = useState([]);
   const [currentCombinationName, setCurrentCombinationName] = useState("");
+  const [isLightMode, setIsLightMode] = useState(true);
   const topRef = useRef(null);
 
   useEffect(() => {
@@ -64,6 +65,21 @@ export default function CoursePlanner() {
       topRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [search, facultySearch]);
+
+  useEffect(() => {
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('coursePlannerTheme');
+    if (savedTheme === 'dark') {
+      setIsLightMode(false);
+    }
+
+    // Listen for theme changes
+    const handleThemeChange = (event) => {
+      setIsLightMode(event.detail.theme === 'light');
+    };
+    window.addEventListener('themeChange', handleThemeChange);
+    return () => window.removeEventListener('themeChange', handleThemeChange);
+  }, []);
 // ...existing code...
 
   const handleAddSection = (course, section) => {
@@ -604,17 +620,27 @@ export default function CoursePlanner() {
   }
 
   return (
-    <div ref={topRef} className="max-w-5xl rounded-2xl mx-auto p-2 sm:p-4  relative min-h-screen ">
+    <div ref={topRef} className={`max-w-5xl rounded-2xl mx-auto p-2 sm:p-4 relative min-h-screen ${
+      isLightMode ? 'text-gray-900' : 'text-white'
+    }`}>
       {/* <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 sm:mb-8 text-center text-white drop-shadow-lg tracking-tight">Course Planner</h1> */}
       
       {/* Sticky Search Section */}
-      <div className="sticky top-15 z-20 bg-gray-800/95 backdrop-blur-md border-2 border-gray-600 shadow-lg mb-6 sm:mb-8 lg:p-4 py-2 transition-all duration-300">
+      <div className={`sticky top-15 z-20 backdrop-blur-md border-2 shadow-lg mb-6 sm:mb-8 lg:p-4 py-2 transition-all duration-300 ${
+        isLightMode 
+          ? 'bg-gray-800/95 border-gray-600' 
+          : 'bg-gradient-to-br from-slate-900 to-slate-800 border-violet-500/30 shadow-violet-500/10'
+      }`}>
         {/* Course Search */}
         <div className="lg:mb-3 mb-1 flex gap-2">
           <input
             type="text"
             placeholder="🔍 Search course code or title..."
-            className="w-full p-2 sm:p-3 border-2 border-gray-600 rounded-lg shadow focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 bg-gray-700 text-white placeholder-gray-300 text-xs sm:text-lg transition-all duration-200"
+            className={`w-full p-2 sm:p-3 border-2 rounded-lg shadow focus:outline-none focus:ring-2 text-xs sm:text-lg transition-all duration-200 ${
+              isLightMode
+                ? 'border-gray-600 focus:border-blue-400 focus:ring-blue-500/20 bg-gray-700 text-white placeholder-gray-300'
+                : 'border-cyan-500/40 shadow-lg shadow-cyan-500/10 focus:border-cyan-400 focus:ring-cyan-500/50 bg-slate-800/80 text-white placeholder-cyan-200/60'
+            }`}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -624,7 +650,11 @@ export default function CoursePlanner() {
           <input
             type="text"
             placeholder="👨‍🏫 Search by faculty name..."
-            className="w-full p-2 sm:p-3 border-2 border-gray-600 rounded-lg shadow focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 bg-gray-700 text-white placeholder-gray-300 text-xs sm:text-lg transition-all duration-200"
+            className={`w-full p-2 sm:p-3 border-2 rounded-lg shadow focus:outline-none focus:ring-2 text-xs sm:text-lg transition-all duration-200 ${
+              isLightMode
+                ? 'border-gray-600 focus:border-purple-400 focus:ring-purple-500/20 bg-gray-700 text-white placeholder-gray-300'
+                : 'border-fuchsia-500/40 shadow-lg shadow-fuchsia-500/10 focus:border-fuchsia-400 focus:ring-fuchsia-500/50 bg-slate-800/80 text-white placeholder-fuchsia-200/60'
+            }`}
             value={facultySearch}
             onChange={e => setFacultySearch(e.target.value)}
           />
@@ -645,7 +675,11 @@ export default function CoursePlanner() {
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="lg:text-xs text-[.6rem] bg-blue-200 hover:bg-blue-300 text-blue-700 px-2 py-1 rounded-full transition-colors duration-200"
+                  className={`lg:text-xs text-[.6rem] px-2 py-1 rounded-full transition-colors duration-200 ${
+                    isLightMode
+                      ? 'bg-blue-200 hover:bg-blue-300 text-blue-700'
+                      : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40'
+                  }`}
                 >
                   Clear Course
                 </button>
@@ -653,7 +687,11 @@ export default function CoursePlanner() {
               {facultySearch && (
                 <button
                   onClick={() => setFacultySearch("")}
-                  className="text-xs bg-purple-200 hover:bg-purple-300 text-purple-700 px-2 py-1 rounded-full transition-colors duration-200"
+                  className={`text-xs px-2 py-1 rounded-full transition-colors duration-200 ${
+                    isLightMode
+                      ? 'bg-purple-200 hover:bg-purple-300 text-purple-700'
+                      : 'bg-fuchsia-500/20 hover:bg-fuchsia-500/30 text-fuchsia-300 border border-fuchsia-500/40'
+                  }`}
                 >
                   Clear Faculty
                 </button>
@@ -680,13 +718,21 @@ export default function CoursePlanner() {
               course.sections.some(section => facultyMatchesSearch(section.faculty, facultySearch));
             
             return (
-              <div key={course.code} className={`bg-white border-2 lg:w-full  shadow-lg p-2 sm:p-6 transition-transform  hover:shadow-2xl ${
-                hasMatchingFaculty ? 'border-purple-200 bg-purple-25' : 'border-blue-100'
+              <div key={course.code} className={`border-2 lg:w-full shadow-lg p-2 sm:p-6 transition-transform hover:shadow-2xl ${
+                isLightMode
+                  ? `bg-white ${hasMatchingFaculty ? 'border-purple-200 bg-purple-25' : 'border-blue-100'}`
+                  : `bg-gradient-to-br from-slate-800 to-slate-900 shadow-xl ${hasMatchingFaculty ? 'border-fuchsia-500/60 shadow-fuchsia-500/20' : 'border-cyan-500/40 shadow-cyan-500/10'}`
               }`}>
-                <h2 className="font-bold lg:text-lg  text-sm text-blue-700 mb-2 flex items-center gap-2">
-                  <span className="inline-block bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full  lg:text-xl text-sm font-semibold">{course.code}</span>
+                <h2 className={`font-bold lg:text-lg text-sm mb-2 flex items-center gap-2 ${
+                  isLightMode ? 'text-blue-700' : 'text-cyan-300'
+                }`}>
+                  <span className={`inline-block px-2 sm:px-3 py-1 rounded-full lg:text-xl text-sm font-semibold ${
+                    isLightMode ? 'bg-blue-100 text-blue-700' : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30'
+                  }`}>{course.code}</span>
                   {hasMatchingFaculty && (
-                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      isLightMode ? 'bg-purple-100 text-purple-700' : 'bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white shadow-lg shadow-fuchsia-500/30'
+                    }`}>
                       Faculty Match
                     </span>
                   )}
@@ -706,16 +752,24 @@ export default function CoursePlanner() {
                     facultyMatchesSearch(section.faculty, facultySearch);
                   
                   return (
-                    <li key={section.section} className="flex flex-col text-xs  lg:text-base sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-100 hover:bg-blue-100 transition">
+                    <li key={section.section} className={`flex flex-col text-xs lg:text-base sm:flex-row items-start sm:items-center gap-2 sm:gap-3 rounded-lg p-2 sm:p-3 border transition ${
+                      isLightMode
+                        ? 'bg-blue-50 border-blue-100 hover:bg-blue-100'
+                        : 'bg-slate-700/50 border-cyan-500/20 hover:bg-slate-700/70 hover:border-cyan-400/40 transition-all duration-200'
+                    }`}>
                       <div className="flex-1 w-full">
-                        <div className="font-semibold text-blue-800">
+                        <div className={`font-semibold ${
+                          isLightMode ? 'text-blue-800' : 'text-cyan-200'
+                        }`}>
                           Section {section.section} 
-                          <span className={`text-xs ml-2 ${highlightFaculty ? 'bg-yellow-200 text-purple-700 px-2 py-1 rounded-full font-bold' : 'text-blue-500'}`}>
+                          <span className={`text-xs lg:text-sm ml-2 ${highlightFaculty ? (isLightMode ? 'bg-yellow-200 text-purple-700 px-2 py-1 rounded-full font-bold' : 'bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 px-2 py-1 rounded-full font-bold shadow-lg shadow-yellow-500/30') : isLightMode ? 'text-blue-500' : 'text-white'}`}>
                             {formatFacultyDisplay(section.faculty)}
                           </span>
                         </div>
                         {combineTimeSlots(section.times).map((combinedTime, idx) => (
-                          <div key={idx} className="lg:text-xs text-[0.7rem] text-gray-600 font-mono">
+                          <div key={idx} className={`lg:text-xs text-[0.7rem] font-mono ${
+                            isLightMode ? 'text-gray-600' : 'text-slate-300'
+                          }`}>
                             {combinedTime}
                           </div>
                         ))}
@@ -727,12 +781,20 @@ export default function CoursePlanner() {
                          
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="bg-gradient-to-r from-purple-500 to-purple-600  text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow hover:from-purple-600 hover:to-purple-700 transition w-full sm:w-auto text-center"
+                          className={`text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow transition w-full sm:w-auto text-center ${
+                            isLightMode
+                              ? 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700'
+                              : 'bg-gradient-to-r from-fuchsia-500 to-purple-600 shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 hover:scale-105 transition-all duration-200'
+                          }`}
                         >
                           Review
                         </a>
                         <button
-                          className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow hover:from-green-600 hover:to-green-700 transition w-full sm:w-auto"
+                          className={`text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold shadow transition w-full sm:w-auto ${
+                            isLightMode
+                              ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
+                              : 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-200'
+                          }`}
                           onClick={() => handleAddSection(course, section)}
                         >
                           Add
@@ -746,8 +808,12 @@ export default function CoursePlanner() {
           );
           })}
         </div>
-        <div className=" md:w-1/2 w-[40%] sticky lg:top-45 top-33 self-start bg-white p-1 sm:p-6 border-2 border-purple-200  shadow-2xl backdrop-blur-lg max-h-[70vh] overflow-y-auto">
-          <h2 className="font-bold mb-3 sm:mb-4 text-sm sm:text-xl  flex items-center gap-2">
+        <div className={`md:w-1/2 w-[40%] sticky lg:top-45 top-33 self-start p-1 sm:p-6 border-2 shadow-2xl backdrop-blur-lg max-h-[70vh] overflow-y-auto ${
+          isLightMode
+            ? 'bg-white border-purple-200'
+            : 'bg-gradient-to-br from-slate-900 to-slate-800 border-violet-500/40 shadow-violet-500/20'
+        }`}>
+          <h2 className="font-bold mb-3 sm:mb-4 text-sm sm:text-xl flex items-center gap-2">
             {/* <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 sm:h-6 sm:w-6 ' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 17v-2a4 4 0 018 0v2m-4-4v4m0 0v4m0-4H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-7z' /></svg> */}
             Current Selection
           </h2>
@@ -757,7 +823,11 @@ export default function CoursePlanner() {
           <input
             type="text"
             placeholder="Combination name (optional)"
-            className="w-full lg:mb-3 mb-1 p-2 border-2 border-purple-200 rounded-lg shadow focus:outline-none focus:border-purple-400 bg-white lg:text-sm text-xs"
+            className={`w-full lg:mb-3 mb-1 p-2 border-2 rounded-lg shadow focus:outline-none lg:text-sm text-xs ${
+              isLightMode
+                ? 'border-purple-200 focus:border-purple-400 bg-white'
+                : 'border-violet-500/40 shadow-violet-500/10 focus:border-violet-400 focus:ring-2 focus:ring-violet-500/50 bg-slate-800/80 text-white placeholder-violet-200/60'
+            }`}
              value={currentCombinationName}
             onChange={e => setCurrentCombinationName(e.target.value)}
           />
@@ -767,17 +837,31 @@ export default function CoursePlanner() {
               <li className="text-gray-400 text-center lg:text-base text-xs">No courses selected.</li>
             )}
             {selectedSections.map((section) => (
-              <li key={section.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-purple-50 rounded-lg p-1 sm:p-3 border border-purple-100 hover:bg-purple-100 transition">
+              <li key={section.id} className={`flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 rounded-lg p-1 sm:p-3 border transition ${
+                isLightMode
+                  ? 'bg-purple-50 border-purple-100 hover:bg-purple-100'
+                  : 'bg-slate-700/50 border-violet-500/30 hover:bg-slate-700/70 hover:border-violet-400/50 transition-all duration-200'
+              }`}>
                 <div className="flex-1 w-full">
-                  <div className="font-semibold text-purple-800 lg:text-base text-[.6rem]">{section.courseCode} - Sec {section.section} <span className="lg:text-xs text-[.6rem] text-purple-500 ml-2">{formatFacultyDisplay(section.faculty)}</span></div>
+                  <div className={`font-semibold lg:text-base text-[.6rem] ${
+                    isLightMode ? 'text-purple-800' : 'text-violet-200'
+                  }`}>{section.courseCode} - Sec {section.section} <span className={`lg:text-xs text-[.6rem] ml-2 ${
+                    isLightMode ? 'text-purple-500' : 'text-violet-400'
+                  }`}>{formatFacultyDisplay(section.faculty)}</span></div>
                   {combineTimeSlots(section.times).map((combinedTime, idx) => (
-                    <div key={idx} className="lg:text-xs text-[.6rem] text-gray-600 font-mono">
+                    <div key={idx} className={`lg:text-xs text-[.6rem] font-mono ${
+                      isLightMode ? 'text-gray-600' : 'text-slate-300'
+                    }`}>
                       {combinedTime}
                     </div>
                   ))}
                 </div>
                 <button
-                  className="bg-gradient-to-r from-red-400 to-pink-500 text-white px-3 py-1 rounded-lg font-bold shadow hover:from-red-500 hover:to-pink-600 transition ml-0 sm:ml-2 w-full sm:w-auto lg:text-base text-[.6rem]"
+                  className={`text-white px-3 py-1 rounded-lg font-bold shadow transition ml-0 sm:ml-2 w-full sm:w-auto lg:text-base text-[.6rem] ${
+                    isLightMode
+                      ? 'bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600'
+                      : 'bg-gradient-to-r from-rose-500 to-pink-600 shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50 hover:scale-105 transition-all duration-200'
+                  }`}
                   onClick={() => {
                     setSelectedSections(selectedSections.filter(sel => sel.id !== section.id));
                     setError("");
@@ -792,7 +876,11 @@ export default function CoursePlanner() {
           {/* Action Buttons */}
           <div className="space-y-2">
             <button
-              className="w-full bg-gradient-to-r from-blue-400 to-indigo-500 text-white py-1 sm:py-2.5 rounded-xl font-bold shadow hover:from-blue-500 hover:to-indigo-600 transition text-[.6rem] sm:text-base"
+              className={`w-full text-white py-1 sm:py-2.5 rounded-xl font-bold shadow transition text-[.6rem] sm:text-base disabled:opacity-50 disabled:cursor-not-allowed ${
+                isLightMode
+                  ? 'bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600'
+                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 shadow-xl shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-[1.02] transition-all duration-200'
+              }`}
               onClick={handleSaveCombination}
               disabled={selectedSections.length === 0}
             >
@@ -802,19 +890,31 @@ export default function CoursePlanner() {
 
           {/* Saved Combinations */}
           {combinations.length > 0 && (
-            <div className="mt-6 pt-4 border-t border-purple-200">
+            <div className={`mt-6 pt-4 border-t ${
+              isLightMode ? 'border-purple-200' : 'border-violet-500/30'
+            }`}>
               <div className=" sm:flex-row gap-2 items-stretch mb-3">
-                <h3 className="font-bold text-purple-700 text-xs sm:text-lg flex-1">Saved Combinations ({combinations.length})</h3>
+                <h3 className={`font-bold text-xs sm:text-lg flex-1 ${
+                  isLightMode ? 'text-purple-700' : 'text-violet-300'
+                }`}>Saved Combinations ({combinations.length})</h3>
                 <div className="flex gap-2 lg:flex-row flex-col my-2">
                   <button
-                    className="bg-gradient-to-r from-orange-400 to-red-500 text-white lg:px-3 px-1 py-2 rounded-lg font-bold shadow hover:from-orange-500 hover:to-red-600 transition text-[.6rem] sm:text-sm flex-1 sm:flex-none"
+                    className={`text-white lg:px-3 px-1 py-2 rounded-lg font-bold shadow transition text-[.6rem] sm:text-sm flex-1 sm:flex-none ${
+                      isLightMode
+                        ? 'bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600'
+                        : 'bg-gradient-to-r from-orange-500 to-amber-600 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 transition-all duration-200'
+                    }`}
                     onClick={handleExportCombinations}
                     data-export-btn
                   >
                     Export as Image
                   </button>
                   <button
-                    className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-2 rounded-lg font-bold shadow hover:from-purple-600 hover:to-indigo-700 transition text-[.6rem] sm:text-sm flex-1 sm:flex-none"
+                    className={`text-white px-3 py-2 rounded-lg font-bold shadow transition text-[.6rem] sm:text-sm flex-1 sm:flex-none ${
+                      isLightMode
+                        ? 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700'
+                        : 'bg-gradient-to-r from-violet-500 to-purple-600 shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:scale-105 transition-all duration-200'
+                    }`}
                     onClick={handleViewAnalytics}
                   >
                     Analytics
@@ -822,23 +922,43 @@ export default function CoursePlanner() {
                 </div>
               </div>
               
-              <div id="combinations-list" className="space-y-3  overflow-y-auto bg-white lg:p-3 rounded-lg border border-gray-200">
+              <div id="combinations-list" className={`space-y-3 overflow-y-auto lg:p-3 rounded-lg border ${
+                isLightMode
+                  ? 'bg-white border-gray-200'
+                  : 'bg-slate-800/50 border-violet-500/20'
+              }`}>
                 {combinations.map((combination, idx) => (
-                  <div key={combination.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div key={combination.id} className={`rounded-lg p-3 border ${
+                    isLightMode
+                      ? 'bg-gray-50 border-gray-200'
+                      : 'bg-gradient-to-br from-slate-700/60 to-slate-800/60 border-violet-500/30 hover:border-violet-400/50 transition-all duration-200'
+                  }`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-gray-800 text-xs lg:text-sm">{combination.name}</h4>
+                      <h4 className={`font-semibold text-xs lg:text-sm ${
+                        isLightMode ? 'text-gray-800' : 'text-violet-200'
+                      }`}>{combination.name}</h4>
                       <button
-                        className="text-red-500 hover:text-red-700 text-xs font-bold"
+                        className={`text-xs font-bold ${
+                          isLightMode
+                            ? 'text-red-500 hover:text-red-700'
+                            : 'text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 px-2 py-1 rounded transition-all duration-200'
+                        }`}
                         onClick={() => handleRemoveCombination(combination.id)}
                       >
                         ✕
                       </button>
                     </div>
-                    <div className="text-xs lg:block hidden text-gray-500 mb-2">Created: {combination.createdAt}</div>
+                    <div className={`text-xs lg:block hidden mb-2 ${
+                      isLightMode ? 'text-gray-500' : 'text-slate-400'
+                    }`}>Created: {combination.createdAt}</div>
                     <div className="space-y-1">
                       {combination.sections.map((section) => (
-                        <div key={section.id} className="lg:text-xs text-[.6rem] text-gray-700">
-                          <span className="font-medium">{section.courseCode}</span> - Section {section.section} ({formatFacultyDisplay(section.faculty)})
+                        <div key={section.id} className={`lg:text-xs text-[.6rem] ${
+                          isLightMode ? 'text-gray-700' : 'text-slate-300'
+                        }`}>
+                          <span className={`font-medium ${
+                            isLightMode ? 'text-gray-900' : 'text-cyan-300'
+                          }`}>{section.courseCode}</span> - Section {section.section} ({formatFacultyDisplay(section.faculty)})
                         </div>
                       ))}
                     </div>

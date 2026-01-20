@@ -1,10 +1,27 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FaHome, FaBookOpen, FaCalendarAlt, FaCalculator, FaBars, FaTimes } from 'react-icons/fa';
+import { FaHome, FaBookOpen, FaCalendarAlt, FaCalculator, FaBars, FaTimes, FaSun, FaMoon } from 'react-icons/fa';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLightMode, setIsLightMode] = useState(true);
+
+  useEffect(() => {
+    // Check localStorage for saved theme preference
+    const savedTheme = localStorage.getItem('coursePlannerTheme');
+    if (savedTheme === 'dark') {
+      setIsLightMode(false);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = !isLightMode;
+    setIsLightMode(newTheme);
+    localStorage.setItem('coursePlannerTheme', newTheme ? 'light' : 'dark');
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme: newTheme ? 'light' : 'dark' } }));
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -43,6 +60,26 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-2">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="relative flex items-center justify-center text-gray-300 hover:text-white px-3 py-2 rounded-xl transition-all duration-300 group hover:bg-gray-700/50 mr-2"
+              title={isLightMode ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            >
+              <div className="relative">
+                {isLightMode ? (
+                  <FaMoon className="w-5 h-5 group-hover:scale-110 transition-all duration-300 group-hover:text-indigo-400" />
+                ) : (
+                  <FaSun className="w-5 h-5 group-hover:scale-110 transition-all duration-300 group-hover:text-yellow-400" />
+                )}
+                {/* Icon glow */}
+                <div className={`absolute inset-0 w-5 h-5 blur-sm opacity-0 group-hover:opacity-60 transition-opacity duration-300 ${
+                  isLightMode ? 'text-indigo-400' : 'text-yellow-400'
+                }`}>
+                  {isLightMode ? <FaMoon className="w-5 h-5" /> : <FaSun className="w-5 h-5" />}
+                </div>
+              </div>
+            </button>
             {navItems.map((item, index) => (
               <Link
                 key={item.href}
@@ -80,8 +117,34 @@ export default function Navigation() {
             ))}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile Theme Toggle & Menu Button */}
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="relative text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-xl p-3 hover:bg-gray-700/50 transition-all duration-300 group"
+              title={isLightMode ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            >
+              <div className="relative">
+                {isLightMode ? (
+                  <FaMoon size={18} className="group-hover:scale-110 transition-all duration-300 group-hover:text-indigo-400" />
+                ) : (
+                  <FaSun size={18} className="group-hover:scale-110 transition-all duration-300 group-hover:text-yellow-400" />
+                )}
+                {/* Icon glow */}
+                <div className={`absolute inset-0 blur-sm opacity-0 group-hover:opacity-60 transition-opacity duration-300 ${
+                  isLightMode ? 'text-indigo-400' : 'text-yellow-400'
+                }`}>
+                  {isLightMode ? <FaMoon size={18} /> : <FaSun size={18} />}
+                </div>
+              </div>
+              {/* Button glow */}
+              <div className={`absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm ${
+                isLightMode ? 'bg-indigo-500/20' : 'bg-yellow-500/20'
+              }`}></div>
+            </button>
+
+            {/* Hamburger Menu Button */}
             <button
               onClick={toggleMenu}
               className="relative text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-xl p-3 hover:bg-gray-700/50 transition-all duration-300 group"
