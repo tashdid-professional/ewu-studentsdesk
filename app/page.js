@@ -1,6 +1,7 @@
 import CoursePlannerCard from "../components/CoursePlannerCard";
 import RoutineGeneratorCard from "../components/RoutineGeneratorCard";
 import CgpaCalculatorCard from "../components/CgpaCalculatorCard";
+import CourseHubCard from "../components/CourseHubCard";
 
 export default function Home() {
   return (
@@ -22,11 +23,19 @@ export default function Home() {
         <div className="mx-auto w-24 h-0.5 bg-gradient-to-r from-gray-600 via-gray-400 to-gray-600 rounded-full "></div>
       </div>
       
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 lg:gap-16 w-full max-w-6xl">
+      {/* First Row - 3 Cards */}
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 lg:gap-16 gap-8 w-full max-w-6xl mb-8">
         {/* Animated 3D Cards */}
         <CoursePlannerCard />
         <RoutineGeneratorCard />
         <CgpaCalculatorCard />
+      </div>
+      
+      {/* Second Row - Course Hub Card (centered) */}
+      <div className="relative z-10 w-full max-w-6xl flex justify-center">
+        <div className="w-full md:w-1/3">
+          <CourseHubCard />
+        </div>
       </div>
       
       {/* Floating particles effect */}

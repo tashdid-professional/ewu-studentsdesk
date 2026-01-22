@@ -32,6 +32,7 @@ export default function Navigation() {
     { href: '/course-planner', icon: FaBookOpen, label: 'Course Planner' },
     { href: '/routine-generator', icon: FaCalendarAlt, label: 'Routine Generator' },
     { href: '/cgpa-calculator', icon: FaCalculator, label: 'CGPA Calculator' },
+    { href: '/course-hub', icon: FaBookOpen, label: 'Course Hub' },
   ];
 
   return (
