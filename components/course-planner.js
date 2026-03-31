@@ -667,8 +667,8 @@ export default function CoursePlanner() {
             {search && ` matching course "${search}"`}
             {facultySearch && ` with faculty "${facultySearch}"`}
           </div>
-          <div><h1 className="text-white lg:text-sm text-[.6rem]">Last updated : 10-1-26</h1></div>
-          <div><h1 className="text-white lg:text-sm text-[.6rem]">Current semester: Spring-25</h1></div>
+          <div><h1 className="text-white lg:text-sm text-[.6rem]">Last updated : 31-3-26</h1></div>
+          <div><h1 className="text-white lg:text-sm text-[.6rem]">Current semester: Summer-26</h1></div>
           {/* Clear search buttons */}
           {(search || facultySearch) && (
             <div className="flex gap-2">
